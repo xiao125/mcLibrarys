@@ -258,6 +258,7 @@
 -keep class com.proxy.net.**{*;}
 -keep class com.proxy.configurator.*{*;}
 -keep class com.proxy.util.LogUtil{*;}
+-keep class com.proxy.util.Util{*;}
 #排除指定内部类
 -keepnames class com.proxy.activity.StartWebView{
     public <fields>;

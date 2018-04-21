@@ -19,6 +19,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
+
+import com.alibaba.fastjson.JSON;
 import com.game.sdk.Constants;
 import com.game.sdk.GameSDK;
 import com.game.sdk.ResultCode;
@@ -300,7 +302,8 @@ public class FirstLoginActivity extends Activity implements OnClickListener {
 			@Override
 			public void onSuccess(String response) {
 
-				switch (Integer.valueOf(response)) {
+				final int code = JSON.parseObject(response).getIntValue("code");
+				switch (code) {
 					case ResultCode.SUCCESS: //成功
 
 						//登录成功之后就保存账号密码
@@ -311,10 +314,6 @@ public class FirstLoginActivity extends Activity implements OnClickListener {
 
 						break;
 
-					case ResultCode.FAILS: //帐号或密码输入错误,请重新输入
-						Util.ShowTips(activity,"帐号或密码输入错误,请重新输入!");
-
-						break;
 					case ResultCode.NONEXISTENT: //账号不存在
 						//Util.ShowTips(activity,"账号不存在!");
 
@@ -379,7 +378,7 @@ public class FirstLoginActivity extends Activity implements OnClickListener {
 						break;
 					default:
 
-						Util.ShowTips(activity,"数据错误了！");
+						Util.ShowTips(activity,JSON.parseObject(response).getString("reason"));
 						break;
 				}
 
@@ -389,6 +388,9 @@ public class FirstLoginActivity extends Activity implements OnClickListener {
 			public void onError(int code, String msg) {
 
 				LoadingDialog.dismiss();
+
+				Util.ShowTips(activity,"请求服务器失败!");
+
 
 			}
 		});

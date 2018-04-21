@@ -413,31 +413,21 @@ public class AutoLoginActivity extends Activity implements View.OnClickListener 
 			@Override
 			public void onSuccess(String response) {
 
-				switch (Integer.valueOf(response)) {
+				final int code = JSON.parseObject(response).getIntValue("code");
+				switch (code) {
 					case ResultCode.SUCCESS: //成功
 
-						//登录成功之后就保存账号密码
-						DBHelper.getInstance().insertOrUpdateUser( muserName, mpassWord );
 						remind(etname);
-
 						KnLog.log("=====sdk已经登录成功======"+response);
 
 						//TODO 查询账号是否绑定手机号
 						initQueryBind(muserName);
 
-
 						break;
 
-					case ResultCode.FAILS: //帐号或密码输入错误,请重新输入
-						Util.ShowTips(m_activity,"帐号或密码输入错误,请重新输入!");
-
-						break;
-					case ResultCode.NONEXISTENT: //账号不存在
-						Util.ShowTips(m_activity,"账号不存在!");
-						break;
 					default:
+						Util.ShowTips(m_activity,JSON.parseObject(response).getString("reason"));
 
-						Util.ShowTips(m_activity,"数据错误了！");
 						break;
 				}
 
@@ -446,7 +436,7 @@ public class AutoLoginActivity extends Activity implements View.OnClickListener 
 			@Override
 			public void onError(int code, String msg) {
 
-
+				Util.ShowTips(m_activity,"请求服务器失败!");
 			}
 		});
 	}
@@ -488,6 +478,7 @@ public class AutoLoginActivity extends Activity implements View.OnClickListener 
 		}, new IError() {
 			@Override
 			public void onError(int code, String msg) {
+				Util.ShowTips(m_activity,"服务器响应失败了！");
 
 			}
 		});

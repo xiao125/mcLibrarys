@@ -719,7 +719,7 @@ public class FastLoginActivity extends Activity {
 
                     default: //失败
 
-                        Util.ShowTips(FastLoginActivity.this,  Util.getJsonStringByName(response, "reason" ) );
+                        Util.ShowTips(FastLoginActivity.this, JSON.parseObject(response).getString("reason") );
 
                         break;
                 }
@@ -730,6 +730,8 @@ public class FastLoginActivity extends Activity {
             public void onError(int code, String msg) {
 
                 LoadingDialog.dismiss();
+                Util.ShowTips(m_activity,"服务器响应失败了！");
+
             }
         });
 
@@ -744,7 +746,8 @@ public class FastLoginActivity extends Activity {
             @Override
             public void onSuccess(String response) {
 
-                switch (Integer.valueOf(response)) {
+                final int code = JSON.parseObject(response).getIntValue("code");
+                switch (code) {
                     case ResultCode.SUCCESS: //成功
 
                         //登录成功之后就保存账号密码
@@ -756,16 +759,9 @@ public class FastLoginActivity extends Activity {
                         initQueryBind(muserName);
                         break;
 
-                    case ResultCode.FAILS: //帐号或密码输入错误,请重新输入
-                        Util.ShowTips(m_activity,"帐号或密码输入错误,请重新输入!");
-
-                        break;
-                    case ResultCode.NONEXISTENT: //账号不存在
-                        Util.ShowTips(m_activity,"账号不存在!");
-                        break;
                     default:
 
-                        Util.ShowTips(m_activity,"数据错误了！");
+                        Util.ShowTips(m_activity,JSON.parseObject(response).getString("reason"));
                         break;
                 }
 
@@ -773,7 +769,7 @@ public class FastLoginActivity extends Activity {
         }, new IError() {
             @Override
             public void onError(int code, String msg) {
-
+                Util.ShowTips(m_activity,"服务器响应失败了！");
 
             }
         });
@@ -817,6 +813,7 @@ public class FastLoginActivity extends Activity {
         }, new IError() {
             @Override
             public void onError(int code, String msg) {
+                Util.ShowTips(m_activity,"服务器响应失败了！");
 
             }
         });
@@ -946,19 +943,21 @@ public class FastLoginActivity extends Activity {
       HttpService.doMobileRegister(userphone, security_code, password, new ISuccess() {
           @Override
           public void onSuccess(String response) {
+              LoadingDialog.dismiss();
 
-              switch (Integer.valueOf(response)) {
+            final  int code = JSON.parseObject(response).getIntValue("code");
+
+              switch (code) {
                   case ResultCode.SUCCESS: //成功
-
                       //添加手机账号
                       DBHelper.getInstance().insertOrUpdateUser(m_phone, m_pw);
                       Util.ShowTips(FastLoginActivity.this, getResources().getString(R.string.mc_tips_15));
                       GameSDK.instance.login(FastLoginActivity.this); //跳转到免密码登录
                       break;
 
-
                   default:
-                      Util.ShowTips(FastLoginActivity.this,response);
+                      KnLog.log("手机注册失败："+JSON.parseObject(response).getString("reason"));
+                      Util.ShowTips(FastLoginActivity.this, JSON.parseObject(response).getString("reason"));
                       break;
               }
 
@@ -967,6 +966,8 @@ public class FastLoginActivity extends Activity {
       }, new IError() {
           @Override
           public void onError(int code, String msg) {
+              LoadingDialog.dismiss();
+              Util.ShowTips(m_activity,"服务器响应失败了！");
 
           }
       });

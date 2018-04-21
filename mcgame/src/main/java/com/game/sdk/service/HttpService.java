@@ -44,36 +44,6 @@ public class HttpService {
 	private static final String PROXY_VERSION = "1.0.1" ;
 	private static final String reg_key="kuniu@!#2014";
 
-	//查询是否绑定账号
-	public static void queryBindMsi( Context applicationContext, Handler handler){
-		
-		String imei = DeviceUtil.getDeviceId();
-		String appInfo = Util.getAppInfo( GameSDK.getInstance().getActivity() );
-//		String proxy_version = KnUtil.getJsonStringByName(appInfo, "versionCode") ;
-		String proxy_version = PROXY_VERSION;
-		String app_secret = "3d759cba73b253080543f8311b6030bf";
-		
-		Map<String, String> update_params = new TreeMap<String, String>( new Comparator<String>() {
-
-			@Override
-			public int compare(String arg0, String arg1) {
-				// TODO Auto-generated method stub
-				return arg0.compareTo(arg1);
-			}
-		} );
-		
-		update_params.put("msi",imei);
-		
-		Log.e("msi", imei);
-		update_params.put("proxyVersion",proxy_version);
-		
-		Map<String, String> update_params1 = Util.getSign( update_params , app_secret ); //默认签名规则
-		
-		new QueryMsiBindAsyncTask(applicationContext, handler, SDK.QUERY_MSI_BIND)
-				.execute(new Map[] { update_params1, null, null });
-		
-	}
-
 
 	//查询账号是否绑定手机号
 	public static void queryBindAccont(String user_Name, final ISuccess iSuccess, IError iError ){
@@ -108,37 +78,6 @@ public class HttpService {
 					.build()
 					.post();
 
-
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-	}
-
-
-
-	//验证账号是否存在
-	public static void getUsername(Context applicationContext,Handler handler, String user_Name ){
-
-		try {
-
-
-			GameInfo gameInfo = GameSDK.getInstance().getGameInfo();
-
-			HashMap<String , String> params = getCommonParams();
-
-			String game_id = gameInfo.getGameId();
-			String platform = gameInfo.getPlatform();
-			String channel = gameInfo.getChannel();
-
-			JSONObject content = new JSONObject();
-			content.put("user_name",user_Name);
-			params.put("content", content.toString());
-			params.put("sign", Md5Util.getMd5(content + GameSDK.getInstance().getGameInfo().getRegKey())); //这个接口验签必须是md5
-
-			new GetUserNameAsyncTask(applicationContext, handler, SDK.GET_USER_NAME)
-					.execute(new Map[] { params , null, null });
 
 
 		} catch (Exception e) {
@@ -622,9 +561,10 @@ public class HttpService {
 									GameSDK.getInstance().setUserInfo(userInfo);
 
 									KnLog.log("=========登录成功后-=====账号："+user_name+" 密码="+passwd);
+									//登录成功之后就保存账号密码
 									DBHelper.getInstance().insertOrUpdateUser( userInfo.getUsername() , passwd);
 
-									iSuccess.onSuccess(String.valueOf(code));
+									iSuccess.onSuccess(response);
 
 									break;
 
@@ -633,7 +573,8 @@ public class HttpService {
 									if (GameSDK.getInstance().getmLoginListener() != null) {
 										GameSDK.getInstance().getmLoginListener().onFail(response.toString());
 									}
-									iSuccess.onSuccess(String.valueOf(code));
+									iSuccess.onSuccess(response);
+
 
 									break;
 							}
@@ -708,7 +649,6 @@ public class HttpService {
 						public void onSuccess(String response) {
 
 							final int code = JSON.parseObject(response).getIntValue("code");
-
 							switch (code) {
 								case ResultCode.SUCCESS: //成功
 
@@ -716,7 +656,7 @@ public class HttpService {
 										GameSDK.getInstance().getmLoginListener().onSuccess(response.toString());
 									}
 
-									iSuccess.onSuccess(String.valueOf(code));
+									iSuccess.onSuccess(response);
 
 									break;
 								default:

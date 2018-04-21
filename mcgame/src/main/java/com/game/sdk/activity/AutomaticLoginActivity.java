@@ -172,7 +172,8 @@ public class AutomaticLoginActivity extends Activity {
 
                 LoadingDialog.dismiss();
 
-                switch (Integer.valueOf(response)) {
+                final int code = JSON.parseObject(response).getIntValue("code");
+                switch (code) {
                     case ResultCode.SUCCESS: //成功
 
                         //登录成功之后就保存账号密码
@@ -184,28 +185,11 @@ public class AutomaticLoginActivity extends Activity {
 
                         break;
 
-                    case ResultCode.FAILS: //帐号或密码输入错误,请重新输入
-
-                        Util.ShowTips(m_activity,"帐号或密码输入错误,请重新输入!");
-
-                        m_activity.finish();
-                        m_activity = null ;
-
-
-                        break;
-                    case ResultCode.NONEXISTENT: //账号不存在
-                        Util.ShowTips(m_activity,"账号不存在!");
-
-                        m_activity.finish();
-                        m_activity = null ;
-
-                        break;
                     default:
 
-                        Util.ShowTips(m_activity,"数据错误了！");
+                        Util.ShowTips(m_activity,JSON.parseObject(response).getString("reason"));
                         m_activity.finish();
                         m_activity = null ;
-
                         break;
                 }
 
@@ -214,7 +198,7 @@ public class AutomaticLoginActivity extends Activity {
             @Override
             public void onError(int code, String msg) {
                 LoadingDialog.dismiss();
-                Util.ShowTips(m_activity,"数据错误了！");
+                Util.ShowTips(m_activity,"请求服务器失败！");
             }
         });
     }

@@ -263,7 +263,7 @@ public class ForgotPasswordActivity extends Activity {
 
                     default:
 
-                        Util.ShowTips(activity,"尚未绑定手机号");
+                        Util.ShowTips(activity,JSON.parseObject(response).getString("reason"));
 
                         break;
                 }
@@ -272,6 +272,7 @@ public class ForgotPasswordActivity extends Activity {
         }, new IError() {
             @Override
             public void onError(int code, String msg) {
+                Util.ShowTips(activity,"服务器响应失败了！");
 
             }
         });
@@ -299,12 +300,12 @@ public class ForgotPasswordActivity extends Activity {
                         break;
 
                     case ResultCode.GET_USER:
-                        Util.ShowTips(activity,"该账号没有被注册过,请重新输入！");
+                        Util.ShowTips(activity,JSON.parseObject(response).getString("reason"));
                         break;
 
                     default: //失败
 
-                        Util.ShowTips(activity,"查询出现错误");
+                        Util.ShowTips(activity,JSON.parseObject(response).getString("reason"));
 
                         break;
 
@@ -315,6 +316,8 @@ public class ForgotPasswordActivity extends Activity {
             @Override
             public void onError(int code, String msg) {
                 LoadingDialog.dismiss();
+                Util.ShowTips(activity,"服务器响应失败了！");
+
             }
         });
 

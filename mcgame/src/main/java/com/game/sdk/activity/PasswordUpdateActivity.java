@@ -271,7 +271,7 @@ public class PasswordUpdateActivity extends Activity implements OnClickListener 
 
 					default: //失败
 
-						Util.ShowTips(PasswordUpdateActivity.this,Util.getJsonStringByName( response , "reason" ) );
+						Util.ShowTips(PasswordUpdateActivity.this,JSON.parseObject(response).getString("reason") );
 						break;
 
 				}
@@ -285,6 +285,7 @@ public class PasswordUpdateActivity extends Activity implements OnClickListener 
 
 				LoadingDialog.dismiss();
 
+				Util.ShowTips(m_activity,"服务器响应失败了！");
 
 			}
 		});

@@ -250,7 +250,7 @@ public class BindCellActivity  extends Activity implements OnClickListener {
 						break;
 
 					default: //失败
-						Util.ShowTips(BindCellActivity.this,Util.getJsonStringByName( response , "reason" ) );
+						Util.ShowTips(m_activity,JSON.parseObject(response).getString("reason") );
 						break;
 
 				}
@@ -265,7 +265,7 @@ public class BindCellActivity  extends Activity implements OnClickListener {
 			public void onError(int code, String msg) {
 
 				LoadingDialog.dismiss();
-
+				Util.ShowTips(m_activity,"服务器响应失败了！");
 
 			}
 		});
@@ -287,7 +287,6 @@ public class BindCellActivity  extends Activity implements OnClickListener {
 				LoadingDialog.dismiss();
 				KnLog.log("绑定手机验接口========"+ JSON.parseObject(response));
 				final int code = JSON.parseObject(response).getIntValue("code");
-				final String msg_content  = JSON.parseObject(response).getString("reason");
 
 				switch (code){
 					case ResultCode.SUCCESS: //成功
@@ -295,7 +294,7 @@ public class BindCellActivity  extends Activity implements OnClickListener {
 						if (GameSDK.getInstance().getmLoginListener() != null) {
 							GameSDK.getInstance().getmLoginListener().onSuccess(response);
 
-							Util.ShowTips(m_activity,msg_content);
+							Util.ShowTips(m_activity,JSON.parseObject(response).getString("reason"));
 
 							if (m_activity!=null){
 								m_activity.finish();
@@ -310,7 +309,7 @@ public class BindCellActivity  extends Activity implements OnClickListener {
 
 						if (GameSDK.getInstance().getmLoginListener() != null) {
 							GameSDK.getInstance().getmLoginListener().onFail(response);
-							Util.ShowTips(m_activity,msg_content);
+							Util.ShowTips(m_activity,JSON.parseObject(response).getString("reason"));
 						}
 
 						break;
@@ -320,6 +319,7 @@ public class BindCellActivity  extends Activity implements OnClickListener {
 			@Override
 			public void onError(int code, String msg) {
 				LoadingDialog.dismiss();
+				Util.ShowTips(m_activity,"服务器响应失败了！");
 
 			}
 		});
