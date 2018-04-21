@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" 
+    >
+    
+    
+    <ImageView 
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+
+        />
+    
+     <TextView
+        android:id="@+id/app_tips"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp"
+        android:text="@string/app_tips" />
+     
+        <Button 
+         android:id="@+id/wxshared"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_marginTop="200dp"
+         android:layout_marginLeft="20dp"
+         android:onClick="onWxshared"
+         android:text="@string/wxShared_tips"
+         />
+     
+      <Button 
+         android:id="@+id/login"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_marginTop="200dp"
+         android:layout_marginLeft="20dp"
+         android:onClick="onLogin"
+         android:text="@string/login_tips"
+         />
+     
+     
+     <Button 
+         android:id="@+id/entergame"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_marginTop="200dp"
+         android:layout_marginLeft="110dp"
+         android:onClick="onEnterGame"
+         android:text="@string/enterGame_tips"
+         />
+     
+      <Button 
+         android:id="@+id/pay"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_marginTop="200dp"
+         android:layout_marginLeft="210dp"
+         android:onClick="onPay"
+         android:text="@string/pay_tips"
+         />
+      
+       <Button 
+         android:id="@+id/logout"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_marginTop="200dp"
+         android:layout_marginLeft="300dp"
+         android:onClick="onLogout"
+         android:text="@string/logout_tips"
+         />
+       
+       
+        <Button 
+         android:id="@+id/switchs"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_marginTop="200dp"
+         android:layout_marginLeft="380dp"
+         android:onClick="onSwitch"
+         android:text="@string/switch_tips"
+         />
+
+    
+</RelativeLayout>

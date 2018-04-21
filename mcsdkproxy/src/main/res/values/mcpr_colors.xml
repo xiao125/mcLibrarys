@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- alipay -->
+	<color name="app_background_color">#FFC0E7FA</color>
+	<color name="text_color_blue">#FF33A7D3</color>
+	<color name="Kn_bgcolor">#ffd1dce9</color>
+	<color name="PopViewDividerColor">#FF33A7D3</color>
+	<color name="invitation">#FFFDFDFE</color>
+</resources>

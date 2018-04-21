@@ -1,0 +1,22 @@
+<resources>
+
+    <string name="app_name">mcTest</string>
+    <string name="mc_app_name">hh</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">DataEyeTest</string>
+    <string name="app_tips">萌创SDK测试</string>
+    <string name="login_tips"> 登 录 </string>
+    <string name="wxShared_tips"> 分 享 </string>
+    <string name="enterGame_tips"> 进入游戏 </string>
+    <string name="pay_tips"> 支 付 </string>
+    <string name="logout_tips"> 登 出 </string>
+    <string name="levelbegin_tips"> A关卡开始 </string>
+    <string name="levelsuccess_tips"> A关卡成功 </string>
+    <string name="levelfaild_tips"> A关卡失败 </string>
+    <string name="taskbegin_tips"> A任务开始 </string>
+    <string name="tasksuccess_tips"> A任务成功 </string>
+    <string name="taskfaild_tips"> A任务失败 </string>
+    <string name="switch_tips">切换账号 </string>
+
+</resources>

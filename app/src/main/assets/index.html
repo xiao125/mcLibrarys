@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <h1>h5页面</h1>
+    <a href="myapp://jp.app/openwith?name=zhangsan&age=26">启动应用app程序</a>
+</head>
+<body>
+<script type="text/javascript">
+
+ function sdkinit() {
+   MCBridge.activate();
+ }
+
+ function sdklogin() {
+
+  MCBridge.login();
+
+ }
+
+ function sdkrole() {
+
+   var jsontext = JSON.stringify({"senceType":"1","userId":"1","serverId":"3","userLv":"4","serverName":"战",
+   "roleName":"xiao","vipLevel":"0","roleCTime":"roleCTime"});
+
+  MCBridge.roleReport(jsontext);
+
+ }
+
+function sdkpay() {
+
+ var payContent = JSON.stringify({"serverID":"123456787","productName":"元宝","coinName":"元宝","coinRate":"10","price":"100","productId":"1"});
+  MCBridge.pay(payContent);
+
+ }
+
+ function sdklogout() {
+  MCBridge.Logout();
+
+ }
+
+ function
+
+</script>
+<script type="text/javascript" src="//static.himengyou.com/jssdk/sdk.js?v=[time]"></script>
+</body>
+</html>
