@@ -57,8 +57,6 @@ public class AutoLoginActivity extends Activity implements View.OnClickListener 
 	private Button  m_btn = null ;
 	private Activity m_activity = null ;
 	private String  m_passwords = null ;
-	private boolean m_dbHas     = false ;
-	private boolean m_youke     = false ;
     private TextView m_uppw,m_account_bt;
     private ArrayList<String> arrlist=new ArrayList<String>();//存放下拉listView中的账号；
     private PopupAdapter adapter;
@@ -67,29 +65,22 @@ public class AutoLoginActivity extends Activity implements View.OnClickListener 
     private boolean isShow=false;
     private ListView etLv=null;
     private EditText account_et,m_aps;
-
 	private  String etname;
 	private  String etpassword;
-
-	//声明一个SharedPreferences对象和一个Editor对象
-	private SharedPreferences preferences;
-	private SharedPreferences.Editor editor;
 	private Boolean iscb=false;
 	private String lastTime; //退出日期
 	private String todayTime;//当前日期
 	private String lastName; //最后退出名字
 	private  String Spname; //存入sp中的key名
 
-	private static  String mlogout; //悬浮窗注销标识
+	private String xname,xpassword; //忘记密码页面传递的参数
 
-	@SuppressLint("NewApi")
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
-		
-		KnLog.log("AutoLogin+++");
-	
+		m_activity = this ;
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		
 		if(GameSDK.getInstance().ismScreenSensor()){
@@ -100,9 +91,8 @@ public class AutoLoginActivity extends Activity implements View.OnClickListener 
 		
 		setContentView(R.layout.mc_auto_login_manager);
 
-		m_activity = this ;
-
-		 mlogout = getIntent().getStringExtra("logout");
+		 xname = getIntent().getStringExtra("userName");
+		 xpassword= getIntent().getStringExtra("password");
 
 
 			 initview();
@@ -185,8 +175,6 @@ public class AutoLoginActivity extends Activity implements View.OnClickListener 
 	private void TomastUser(){
 
 		Util.ShowTips(m_activity,etname+",已登录成功");
-
-
 	}
 
 
@@ -214,23 +202,6 @@ public class AutoLoginActivity extends Activity implements View.OnClickListener 
 	}
 
 
-
-
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-	}
-
-	@Override
-	protected void onPause() {
-		super.onPause();
-	}
-
-	@Override
-	protected void onRestart() {
-		super.onRestart();
-	}
-
 	@Override
 	protected void onResume() {
 		// TODO Auto-generated method stub
@@ -243,45 +214,24 @@ public class AutoLoginActivity extends Activity implements View.OnClickListener 
 	}
 
 	@Override
-	protected void onStart() {
-		super.onStart();
-	}
-
-	@Override
-	protected void onStop() {
-		super.onStop();
-	}
-
-
-	@Override
 	public void onClick(View v) {
 
 		int id = v.getId();
-		Intent intent = null;
-
 			if(id==R.id.login_game_bt){ //登录
 			//	直接登录
 			KnLog.log("直接登录++");
-
 			if(!Util.isNetWorkAvailable(getApplicationContext())){
 				Util.ShowTips(getApplicationContext(),getResources().getString(R.string.mc_tips_34).toString());
 				return ;
 			}
-
-				//判断用户名与密码输入格式
-			//Util.checkRegisterParams(m_activity, account_et,m_aps);
-
 				//判断用户名与密码输入格式
 				checkAccountBindParams(m_activity,account_et);
-
 
 				EtUser();
 
 				KnLog.log("=========2账号："+etname+"========2密码："+etpassword);
 
 			//TODO 账号登录
-			//HttpService.doLogin(getApplicationContext(), handler,etname ,etpassword);
-
 			 initLogin(etname,etpassword);
 
 
@@ -420,8 +370,19 @@ public class AutoLoginActivity extends Activity implements View.OnClickListener 
 						remind(etname);
 						KnLog.log("=====sdk已经登录成功======"+response);
 
-						//TODO 查询账号是否绑定手机号
-						initQueryBind(muserName);
+						//修改完密码后跳转，就不需要判断是否绑定手机
+						if (xname!=null && xpassword !=null){
+
+							KnLog.log("=====忘记密码跳转======name="+xname+" ps="+xpassword);
+							m_activity.finish();
+							m_activity=null;
+
+						}else {
+							//TODO 查询账号是否绑定手机号
+							initQueryBind(muserName);
+
+						}
+
 
 						break;
 

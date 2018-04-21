@@ -53,7 +53,6 @@ public class PasswordUpdateActivity extends Activity implements OnClickListener 
 	public void onClick(View v ) {
 		// TODO Auto-generated method stub
 		int id = v.getId();
-		Intent intent = null;
 		if(id== R.id.password_update_back){ //返回
 
 			if (m_activity!=null){
@@ -99,7 +98,7 @@ public class PasswordUpdateActivity extends Activity implements OnClickListener 
 				//发送更改新密码请求
 		//	HttpService.passwordNewSubmit(m_activity, handler, cell_num , security_code, newpassword,newSdk );
 
-
+            //TODO 修改密码
 			initPsSubmit(cell_num,security_code,newpassword);
 
 
@@ -321,7 +320,6 @@ public class PasswordUpdateActivity extends Activity implements OnClickListener 
 							Intent intent1=new Intent(PasswordUpdateActivity.this, AutoLoginActivity.class);
 							intent1.putExtra("userName", user_name);
 							intent1.putExtra("password",qdPwd);
-							startActivity(intent1);
 
 						if(null==m_activity){
 
