@@ -133,10 +133,10 @@ public class PasswordUpdateActivity extends Activity implements OnClickListener 
 			
 		}else if (id==R.id.passwd_select_login_close){
 
-			if (m_activity!=null){
+			/*if (m_activity!=null){
 				m_activity.finish();
 				m_activity=null;
-			}
+			}*/
 		}
 
 
@@ -354,6 +354,11 @@ public class PasswordUpdateActivity extends Activity implements OnClickListener 
 
 	}
 
+
+	@Override
+	public void onBackPressed() { //禁止返回键
+
+	}
 
 	private Handler m_handler = new Handler(){
 
