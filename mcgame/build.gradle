@@ -49,17 +49,13 @@ dependencies {
 
 
     //网络请求依赖
-    //数据库依赖
-    //JSON依赖Android版
     compile 'com.squareup.okio:okio:1.13.0'
     compile 'com.squareup.okhttp3:okhttp:3.8.1'
     compile 'com.squareup.retrofit2:retrofit:2.3.0'
     compile 'com.squareup.retrofit2:converter-scalars:2.3.0'
-    compile 'org.greenrobot:greendao-generator:3.2.2'
-    compile 'org.greenrobot:greendao:3.2.2'
+    //fastjson
     compile 'com.alibaba:fastjson:1.1.57.android'
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
-
+    //拦截器日志
     compile 'com.squareup.okhttp3:logging-interceptor:3.8.1'
     //Loader依赖
     compile 'com.wang.avi:library:2.1.3'

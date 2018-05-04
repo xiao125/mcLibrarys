@@ -25,13 +25,13 @@ public final class RestCreator {
     /**
      * 参数容器
      */
-    private static final class ParamsHolder {
+   /* private static final class ParamsHolder {
         private static final WeakHashMap<String, Object> PARAMS = new WeakHashMap<>();
     }
 
     public static WeakHashMap<String, Object> getParams() {
         return ParamsHolder.PARAMS;
-    }
+    }*/
 
     /**
      * 构建OkHttp

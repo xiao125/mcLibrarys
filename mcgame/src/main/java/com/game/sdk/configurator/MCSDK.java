@@ -12,8 +12,8 @@ public class MCSDK {
 
     public static Configurator init(Context context) {
         Configurator.getInstance()
-                .getLatteConfigs()
-                .put(ConfigKeys.APPLICATION_CONTEXT, context.getApplicationContext());
+                .getMcConfigs()
+                .put(ConfigKeys.APPLICATION_CONTEXT, context.getApplicationContext());//App全局上下文
         return Configurator.getInstance();
     }
 
@@ -25,7 +25,7 @@ public class MCSDK {
         return getConfigurator().getConfiguration(key); //获取 LATTE_CONFIGS数组中存储的状态
     }
 
-    //获取Context
+    //获取app全局上下文
     public static Context getApplicationContext() {
         return getConfiguration(ConfigKeys.APPLICATION_CONTEXT);
     }

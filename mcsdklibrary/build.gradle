@@ -42,8 +42,6 @@ dependencies {
     implementation files('libs/greendao-api-3.2.2.jar')
     implementation files('libs/greendao-generator-3.2.2.jar')
     implementation files('libs/logging-interceptor-3.8.1.jar')
-    implementation files('libs/mcsdk.jar')
-    implementation files('libs/mcsdkproxy2.0.jar')
     implementation files('libs/okhttp-3.8.1.jar')
     implementation files('libs/okio-1.13.0.jar')
     implementation files('libs/retrofit-2.3.0.jar')

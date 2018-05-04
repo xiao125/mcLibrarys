@@ -318,7 +318,7 @@ public class SdkChannel extends SdkProxy {
 				LogUtil.log("res+fal" + result.toString());
 				mLoginListener.onFail(result.toString());
 			}
-		}, new SusViewMager.a() {
+		}, new SusViewMager.b() {
 			@Override
 			public void a() {
 				kNListener.getLogoutListener().onSuccess(1);
@@ -402,8 +402,7 @@ public class SdkChannel extends SdkProxy {
 
 		//游戏切换账号接口
 		//gameSDK.McLogout(mActivity);
-
-		gameSDK.McLogout(new SusViewMager.a() {
+		gameSDK.McLogout(new SusViewMager.b() {
 			@Override
 			public void a() {
 				kNListener.getLogoutListener().onSuccess(2);

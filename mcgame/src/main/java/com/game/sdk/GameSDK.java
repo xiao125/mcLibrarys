@@ -243,14 +243,20 @@ public class GameSDK {
 
 		KnLog.log("=========自动登录2-======="+isAuot);
 
-       //开启悬浮窗
+     /*  //开启悬浮窗
 		mSusViewMager = SusViewMager.getInstance();
 		if (mSusViewMager !=null){
 			mSusViewMager.setOnLogoutListener(logoutListener);
 		}
 		mSusViewMager.showWithCallback(activity);
 
-
+*/
+		//开启悬浮窗
+		mSusViewMager = SusViewMager.getInstance();
+		if (mSusViewMager !=null){
+			mSusViewMager.setOnLogoutListener(logoutListener);
+		}
+		mSusViewMager.showWithCallback(activity);
 
 	}
 

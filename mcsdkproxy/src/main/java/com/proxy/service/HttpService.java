@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import org.greenrobot.greendao.query.WhereCondition;
 import org.json.JSONObject;
 import android.app.Activity;
 
@@ -234,11 +233,11 @@ public class HttpService {
 
 			LogUtil.e("sdk下单参数："+params.toString());
 
-			new CommonAsyncTask(activity , Constants.URL.APPLY_ORDER, listener)
-					.execute(new Map[] { params, null, null });
+			/*new CommonAsyncTask(activity , Constants.URL.APPLY_ORDER, listener)
+					.execute(new Map[] { params, null, null });*/
 
 
-		/*	//游戏服务器下单
+			//游戏服务器下单
 			RestClient.builder()
 					.url(Constants.URLS.APPLY_ORDER)
 					.params(params)
@@ -271,7 +270,7 @@ public class HttpService {
 					})
 					.build()
 					.post();
-*/
+
 
 		   }catch (Exception e){
 			e.printStackTrace();

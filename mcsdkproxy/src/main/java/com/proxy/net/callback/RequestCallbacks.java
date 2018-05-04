@@ -73,7 +73,7 @@ public final class RequestCallbacks implements Callback<String> {
             HANDLER.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    RestCreator.getParams().clear();
+
                     LatteLoader.stopLoading();
                 }
             }, delayed);

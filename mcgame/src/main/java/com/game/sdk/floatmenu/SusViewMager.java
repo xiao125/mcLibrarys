@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 
 import com.game.sdk.activity.AutoLoginActivity;
+import com.game.sdk.configurator.ConfigKeys;
 import com.game.sdk.util.DBHelper;
 import com.game.sdk.util.KnLog;
 import com.game.sdk.util.Util;
@@ -23,9 +24,7 @@ import java.util.ArrayList;
  *
  */
 
-public class SusViewMager {
-
-    private static SusViewMager mInstance;
+public final class SusViewMager {
 
     FloatLogoMenu mFloatMenu;
 
@@ -51,7 +50,7 @@ public class SusViewMager {
     }
 
 
-    public static SusViewMager getInstance(){
+    /*public static SusViewMager getInstance(){
 
         if (mInstance ==null){
 
@@ -62,6 +61,17 @@ public class SusViewMager {
             }
         }
         return mInstance;
+    }*/
+
+    //静态内部类单例模式
+    public static class Hoderl{
+
+        public static final SusViewMager INSTANCE = new SusViewMager();
+    }
+
+   public static SusViewMager getInstance(){
+        return Hoderl.INSTANCE;
+
     }
 
 

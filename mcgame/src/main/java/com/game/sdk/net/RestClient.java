@@ -26,7 +26,7 @@ import retrofit2.Callback;
 
 public final class RestClient {
 
-    private static final WeakHashMap<String, Object> PARAMS = RestCreator.getParams();
+    private final WeakHashMap<String, Object> PARAMS;
     private final String URL;
     private final IRequest REQUEST;
     private final String DOWNLOAD_DIR;
@@ -41,7 +41,7 @@ public final class RestClient {
     private final Context CONTEXT;
 
     RestClient(String url,
-               Map<String, Object> params,
+               WeakHashMap<String, Object> params,
                String downloadDir,
                String extension,
                String name,
@@ -54,7 +54,7 @@ public final class RestClient {
                Context context,
                LoaderStyle loaderStyle) {
         this.URL = url;
-        PARAMS.putAll(params);
+        this.PARAMS = params;
         this.DOWNLOAD_DIR = downloadDir;
         this.EXTENSION = extension;
         this.NAME = name;
