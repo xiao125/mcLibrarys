@@ -105,8 +105,6 @@ public class TourtistRegActivity extends Activity implements View.OnClickListene
                 KnLog.log("获取的手机号是="+phone);
                 LoadingDialog.show(activity, "获取验证码中...", true);
 
-
-
                 //TODO 发送手机验证码
                 initSecCode(phone);
 

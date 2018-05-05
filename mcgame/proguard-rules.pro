@@ -256,7 +256,7 @@
 -keep class com.game.sdk.Loader.*{*;}
 -keep class com.game.sdk.net.**{*;}
 -keep class com.game.sdk.configurator.*{*;}
-
+-keep class com.game.sdk.util.timer.*{*;}
 
 #排除指定内部类
 -keepnames class com.game.sdk.activity.StartWebView{

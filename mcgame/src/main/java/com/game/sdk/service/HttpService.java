@@ -228,28 +228,7 @@ public class HttpService {
 			RestClient.builder()
 					.url(SDK.URL.GET_RESURITY_CODE_URL)
 					.params(update_params)
-					.success(new ISuccess() {
-						@Override
-						public void onSuccess(String response) {
-
-							KnLog.log("获取手机验证码接口========"+JSON.parseObject(response));
-							final int code = JSON.parseObject(response).getIntValue("code");
-							switch (code){
-								case ResultCode.SUCCESS: //成功
-									 iSuccess.onSuccess(response);
-
-									break;
-
-								default: //失败
-									Util.ShowTips(context,Util.getJsonStringByName( response , "reason" ) );
-									break;
-
-							}
-
-
-
-						}
-					})
+					.success(iSuccess)
 					.error(iError)
 					.build()
 					.post();

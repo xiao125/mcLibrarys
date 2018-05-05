@@ -23,7 +23,10 @@ import com.game.sdk.service.HttpService;
 import com.game.sdk.util.DBHelper;
 import com.game.sdk.util.KnLog;
 import com.game.sdk.util.LoadingDialog;
+import com.game.sdk.util.LogUtil;
 import com.game.sdk.util.Util;
+import com.game.sdk.util.timer.BaseTimerTask;
+import com.game.sdk.util.timer.ITimerListener;
 import com.game.sdkproxy.R;
 import com.game.sdk.net.callback.IError;
 import com.game.sdk.net.callback.ISuccess;
@@ -33,7 +36,7 @@ import java.util.TimerTask;
 /**
  * 通过手机验证码重新修改密码
  */
-public class PasswordUpdateActivity extends Activity implements OnClickListener {
+public class PasswordUpdateActivity extends Activity implements OnClickListener,ITimerListener {
 	
 	private Activity m_activity = null ;
 	private EditText m_code = null ;
@@ -47,7 +50,9 @@ public class PasswordUpdateActivity extends Activity implements OnClickListener 
 	private Message  m_msg = null ;
 	private String  qdPwd;
 	private String newpassword; //输入的密码进行md5加密存入本地数据库
-
+	//倒计时秒数
+	private int mCount=60;
+	private Timer mTimer =null;
 
 	@Override
 	public void onClick(View v ) {
@@ -57,6 +62,7 @@ public class PasswordUpdateActivity extends Activity implements OnClickListener 
 
 			if (m_activity!=null){
 
+				TimerClos();
 				Intent intent1 = new Intent(PasswordUpdateActivity.this,ForgotPasswordActivity.class);
 				startActivity(intent1);
 				m_activity.finish();
@@ -245,26 +251,7 @@ public class PasswordUpdateActivity extends Activity implements OnClickListener 
 				switch (code){
 					case ResultCode.SUCCESS: //成功
 
-						m_update_code.setClickable(false);
-						m_timer = new Timer();
-						m_time = 60 ;
-						m_timer.schedule(new TimerTask() {
-
-							@Override
-							public void run() {
-								// TODO Auto-generated method stub
-								m_msg = new Message();
-								if(0==m_time){
-									m_msg.what = 10001;
-									m_timer.cancel();
-								}else{
-									m_time -- ;
-									m_msg.what = 10000;
-								}
-								m_handler.sendMessage(m_msg);
-							}
-						},1000,1000);
-
+						initTimer();
 
 						break;
 
@@ -325,6 +312,7 @@ public class PasswordUpdateActivity extends Activity implements OnClickListener 
 
 					     	}else{
 
+							TimerClos();
 							m_activity.startActivity(intent1);
 							m_activity.finish();
 							m_activity = null ;
@@ -358,24 +346,57 @@ public class PasswordUpdateActivity extends Activity implements OnClickListener 
 
 	}
 
-	private Handler m_handler = new Handler(){
 
-		@Override
-		public void handleMessage(Message msg) {
-			// TODO Auto-generated method stub
-			super.handleMessage(msg);
-			if(10001==msg.what){
-				m_update_code.setClickable(true);
-				m_update_code.setText(R.string.mc_tips_48);
+
+	//开始倒计时
+	private void initTimer(){
+
+		mTimer = new Timer();
+		final BaseTimerTask task = new BaseTimerTask(this);
+		mTimer.schedule(task,1000,1000);
+
+	}
+
+
+	@Override
+	public void onTimer() {
+
+		LogUtil.log("开始了-------------");
+		m_activity.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+
+				if (m_update_code != null) {
+
+					m_update_code.setEnabled(false);
+					mCount--;
+					m_update_code.setText(String.valueOf(mCount) + "秒");
+					m_update_code.setBackgroundColor(getResources().getColor(R.color.mc_kn_text));
+
+					if (mCount <= 0) {
+						m_update_code.setText("重新发送");
+						m_update_code.setBackgroundColor(getResources().getColor(R.color.mc_Kn_Username));
+						m_update_code.setEnabled(true);
+						mTimer.cancel();
+						mCount=60;
+					}
+				}
+
 			}
-			else if(10000==msg.what){
-				String text =m_time+"秒";
-				m_update_code.setBackgroundResource(R.color.mc_kn_text);
-				m_update_code.setText(text);
-			}
+
+		});
+		LogUtil.log("结束了-------------");
+
+	}
+
+	//关闭Timer
+	private void TimerClos(){
+		if (mTimer!=null){
+			mTimer.cancel();
+			mTimer=null;
 		}
 
-	};
+	}
 
 
 }

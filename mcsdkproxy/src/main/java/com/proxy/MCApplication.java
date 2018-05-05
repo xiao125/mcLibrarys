@@ -5,7 +5,6 @@ import android.app.Application;
 import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 
-import com.game.sdk.b.a;
 import com.game.sdk.configurator.MCSDK;
 import com.proxy.configurator.MCProxys;
 
@@ -14,6 +13,7 @@ import com.proxy.configurator.MCProxys;
  */
 
 public class MCApplication extends Application{
+
 
     private Activity mActivity;
     @Override
@@ -25,6 +25,9 @@ public class MCApplication extends Application{
                 .withLoaderDelayed(0)
                 .withActivity(mActivity)
                 .configure();
+
+
+
 
         MCSDK.init(MCApplication.this)
                 .withApiHost(Constants.OMD_URLS)

@@ -31,8 +31,11 @@ import com.game.sdk.service.HttpService;
 import com.game.sdk.util.DBHelper;
 import com.game.sdk.util.KnLog;
 import com.game.sdk.util.LoadingDialog;
+import com.game.sdk.util.LogUtil;
 import com.game.sdk.util.TodayTimeUtils;
 import com.game.sdk.util.Util;
+import com.game.sdk.util.timer.BaseTimerTask;
+import com.game.sdk.util.timer.ITimerListener;
 import com.game.sdkproxy.R;
 import com.game.sdk.net.callback.IError;
 import com.game.sdk.net.callback.ISuccess;
@@ -45,12 +48,12 @@ import java.util.TimerTask;
 /**
  * 快速注册
  */
-public class FastLoginActivity extends Activity {
+public class FastLoginActivity extends Activity implements ITimerListener {
 
 
     private Activity m_activity = null ;
     private ImageView select_close,m_phone_ks_close;
-    private Button user_register,phone_register,phone_ks_code,kn_user_zc;
+    private Button user_register,phone_register,mTvTimer,kn_user_zc;
     private LinearLayout user_layout,phone_layout;
 
     private TextView masscount;
@@ -63,7 +66,7 @@ public class FastLoginActivity extends Activity {
     public String m_pw;
 
     public String randName;
-
+    private Timer mTimer =null;
     private  boolean isCountDown=false; //倒计时标识
 
     public static final String allChar = "0123456789";
@@ -76,14 +79,8 @@ public class FastLoginActivity extends Activity {
     private String todayTime;//当前日期
     private String lastName; //最后退出名字
     private  String Spname; //存入sp中的key名
-
-
-
-
-    /**
-     * 倒计时秒数
-     */
-    private int mCount;
+    //倒计时秒数
+    private int mCount=60;
 
 
     @Override
@@ -162,7 +159,7 @@ public class FastLoginActivity extends Activity {
                 phone_layout.setVisibility(View.VISIBLE);//显示
                 isVISIBLE=true;
 
-                phone_ks_code.setVisibility(View.VISIBLE); //显示倒计时
+                mTvTimer.setVisibility(View.VISIBLE); //显示倒计时
 
 
                 KnLog.log("手机注册。。。。。，isVISIBLE="+isVISIBLE);
@@ -188,7 +185,7 @@ public class FastLoginActivity extends Activity {
 
                 //如果用户注册界面显示时且手机注册界面倒计时正在进行时，隐藏倒计时
                 if(isCountDown && (user_layout.getVisibility()==View.VISIBLE)){
-                    phone_ks_code.setVisibility(View.INVISIBLE);
+                    mTvTimer.setVisibility(View.INVISIBLE);
                 }
 
                 KnLog.log("用户名注册。。。。。，isVISIBLE="+isVISIBLE);
@@ -230,7 +227,7 @@ public class FastLoginActivity extends Activity {
 
 
         //验证码倒计时
-        phone_ks_code.setOnClickListener(new View.OnClickListener() {
+        mTvTimer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
@@ -240,7 +237,9 @@ public class FastLoginActivity extends Activity {
                     return;
                 }
 
-                countdownTimer();
+               // countdownTimer();
+
+                //发送短信接口
                 sendcod();
 
             }
@@ -272,6 +271,12 @@ public class FastLoginActivity extends Activity {
                Intent intent = new Intent(FastLoginActivity.this, AutoLoginActivity.class);
                 intent.putExtra("selectLogin", "selectLogin");
                 startActivity(intent);
+
+                //关闭当前Activity时，如果倒计时还在继续，需要关闭
+                if (mTimer!=null){
+                    mTimer.cancel();
+                    mTimer=null;
+                }
                 m_activity.finish();
                 m_activity = null ;
             }
@@ -463,7 +468,7 @@ public class FastLoginActivity extends Activity {
         phone_ks_register= (EditText) findViewById(R.id.phone_ks_register); //手机号
         phone_ks_register_code= (EditText) findViewById(R.id.phone_ks_register_code); //获取到的验证码
         phone_ks_register_password= (EditText) findViewById(R.id.phone_ks_register_password);//输入的密码
-        phone_ks_code = (Button) findViewById(R.id.phone_ks_code); //验证码
+        mTvTimer = (Button) findViewById(R.id.phone_ks_code); //验证码
         m_phone_ks_close = (ImageView) findViewById(R.id.phone_ks_close); //清除验证码
 
 
@@ -476,42 +481,6 @@ public class FastLoginActivity extends Activity {
 
 
     }
-
-    /**
-     * 发送验证码倒计时
-     */
-    private void countdownTimer(){
-
-        phone_ks_code.setEnabled(false);
-        mCount = 60;
-        final Timer timer = new Timer();
-        TimerTask task = new TimerTask() {
-            @Override
-            public void run() {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mCount--;
-                        phone_ks_code.setText(String.valueOf(mCount)+"秒");
-                        phone_ks_code.setBackgroundColor(getResources().getColor(R.color.mc_kn_text));
-
-                        isCountDown = true;
-
-                        if (mCount<=0){
-
-
-                            phone_ks_code.setText("重新发送");
-                            phone_ks_code.setEnabled(true);
-                            timer.cancel();
-                        }
-                    }
-                });
-            }
-        };
-
-        timer.schedule(task,1000,1000);
-    }
-
 
     /**
      * 发送验证码
@@ -529,9 +498,6 @@ public class FastLoginActivity extends Activity {
         initSecCode(cell_Num);
 
 
-
-
-
     }
 
 
@@ -543,14 +509,24 @@ public class FastLoginActivity extends Activity {
             public void onSuccess(String response) {
                 LoadingDialog.dismiss();
 
+                final int code = JSON.parseObject(response).getIntValue("code");
+                switch (code){
+                    case ResultCode.SUCCESS: //成功
+                        //倒计时
+                        initTimer();
+                        break;
+
+                    default: //失败
+                        Util.ShowTips(m_activity,Util.getJsonStringByName( response , "reason" ) );
+                        break;
+
+                }
 
             }
         }, new IError() {
             @Override
             public void onError(int code, String msg) {
-
                 LoadingDialog.dismiss();
-
 
             }
         });
@@ -952,6 +928,11 @@ public class FastLoginActivity extends Activity {
                       //添加手机账号
                       DBHelper.getInstance().insertOrUpdateUser(m_phone, m_pw);
                       Util.ShowTips(FastLoginActivity.this, getResources().getString(R.string.mc_tips_15));
+
+                      if (mTimer!=null){
+                          mTimer.cancel();
+                          mTimer=null;
+                      }
                       GameSDK.instance.login(FastLoginActivity.this); //跳转到免密码登录
                       break;
 
@@ -974,6 +955,50 @@ public class FastLoginActivity extends Activity {
 
 
   }
+
+
+  //开始倒计时
+  private void initTimer(){
+
+      mTimer = new Timer();
+      final BaseTimerTask task = new BaseTimerTask(this);
+      mTimer.schedule(task,1000,1000);
+
+  }
+
+
+    @Override
+    public void onTimer() {
+
+        LogUtil.log("开始了-------------");
+        m_activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                if (mTvTimer != null) {
+
+                    mTvTimer.setEnabled(false);
+                    mCount--;
+                    mTvTimer.setText(String.valueOf(mCount) + "秒");
+                    mTvTimer.setBackgroundColor(getResources().getColor(R.color.mc_kn_text));
+                    isCountDown = true;
+
+                    if (mCount <= 0) {
+                        mTvTimer.setText("重新发送");
+                        mTvTimer.setBackgroundColor(getResources().getColor(R.color.mc_Kn_Username));
+                        mTvTimer.setEnabled(true);
+                        mTimer.cancel();
+                        mCount=60;
+                    }
+                }
+
+            }
+
+        });
+        LogUtil.log("结束了-------------");
+
+    }
+
 
 
 
