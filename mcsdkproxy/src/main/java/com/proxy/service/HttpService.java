@@ -110,6 +110,7 @@ public class HttpService {
 			GameUser gamuser = Data.getInstance().getGameUser();
 
 			WeakHashMap<String,Object> params = getCommonParamsMap();
+			//HashMap<String,Object> params =getCommonParams();
 
 			String open_id = userInfo != null ? userInfo.getOpenId():"";
 
@@ -233,7 +234,7 @@ public class HttpService {
 
 			LogUtil.e("sdk下单参数："+params.toString());
 
-			/*new CommonAsyncTask(activity , Constants.URL.APPLY_ORDER, listener)
+		/*	new CommonAsyncTask(activity , Constants.URL.APPLY_ORDER, listener)
 					.execute(new Map[] { params, null, null });*/
 
 
@@ -255,8 +256,6 @@ public class HttpService {
 								default:
 									LogUtil.e("sdk下单失败返回："+response);
 									listener.onFail(response); //下单失败
-
-
 									break;
 							}
 
@@ -313,60 +312,7 @@ public class HttpService {
 
 
 
-	public static HashMap<String, String> getCommonParams(){
-		HashMap<String, String> params = new HashMap<String, String>();
-		
-		User userInfo = Data.getInstance().getUser();
-		GameInfo gameInfo = Data.getInstance().getGameInfo();
-		GameUser gamuser = Data.getInstance().getGameUser();
-		
-		String open_id="",game_id="",channel="",ad_channel="",platform="",gid="";
-		String uid="",server_id="";
-		
-		String msi = DeviceUtil.getDeviceId();
-		
-		if(gameInfo!=null){
-			game_id = gameInfo.getGameId();
-			channel = gameInfo.getChannel();
-			LogUtil.e("ad_channel="+ad_channel);
-			ad_channel = gameInfo.getAdChannel();
-			platform = gameInfo.getPlatform();
-		}
-		
-		if(userInfo!=null){
-			open_id = userInfo.getOpenId();
-		}
-		
-		if(gamuser!=null){
-			uid = gamuser.getUid();
-			server_id = String.valueOf(gamuser.getServerId());
-		}
-		
-		params.put("gid", gameInfo.getGid());
-		params.put("game_id", game_id);
-		params.put("channel", channel);
-		params.put("ad_channel", ad_channel);
-		params.put("uid", uid+"");
-		params.put("open_id", open_id);
-		params.put("server_id", server_id);
-		params.put("mac", DeviceUtil.getMacAddress());
-		params.put("platform", platform);
-		params.put("phoneType", DeviceUtil.getPhoneType());
-		params.put("netType", DeviceUtil.getNetWorkType());
-		
-		params.put("msi", msi );
-		
-		params.put("channelVersion", OpenSDK.getInstance().getChannelVersion());
-		params.put("proxyVersion", OpenSDK.getInstance().getProxyVersion());
-		
-		String appInfo = Util.getAppInfo( Data.getInstance().getGameActivity() );
-		params.put("packageName", Util.getJsonStringByName(appInfo, "packageName") );
-		params.put("versionName", Util.getJsonStringByName(appInfo, "versionName") );
-		params.put("versionCode", Util.getJsonStringByName(appInfo, "versionCode") );
-		
-		return params;
-		
-	}
+
 
 
 	public static WeakHashMap<String, Object> getCommonParamsMap(){
@@ -433,6 +379,70 @@ public class HttpService {
 
 	}
 
+
+	public static HashMap<String, Object> getCommonParams(){
+		HashMap<String, Object> params = new HashMap<>();
+
+		User userInfo = Data.getInstance().getUser();
+		GameInfo gameInfo = Data.getInstance().getGameInfo();
+		GameUser gamuser = Data.getInstance().getGameUser();
+
+		String open_id="",game_id="",channel="",ad_channel="",platform="",gid="";
+		String uid="",server_id="";
+
+		String msi = DeviceUtil.getDeviceId();
+
+		if(gameInfo!=null){
+			game_id = gameInfo.getGameId();
+			channel = gameInfo.getChannel();
+			LogUtil.e("ad_channel="+ad_channel);
+			ad_channel = gameInfo.getAdChannel();
+			platform = gameInfo.getPlatform();
+		}
+
+		if(userInfo!=null){
+			open_id = userInfo.getOpenId();
+		}
+
+		if(gamuser!=null){
+			uid = gamuser.getUid();
+			server_id = String.valueOf(gamuser.getServerId());
+		}
+
+		params.put("gid", gameInfo.getGid());
+		params.put("game_id", game_id);
+		params.put("channel", channel);
+		params.put("ad_channel", ad_channel);
+		params.put("uid", uid+"");
+		params.put("open_id", open_id);
+		params.put("server_id", server_id);
+		params.put("mac", DeviceUtil.getMacAddress());
+		params.put("platform", platform);
+		params.put("phoneType", DeviceUtil.getPhoneType());
+		params.put("netType", DeviceUtil.getNetWorkType());
+
+		params.put("msi", msi );
+
+		String channelversion = OpenSDK.getInstance().getChannelVersion();
+
+		if( channelversion == null){
+			params.put("channelVersion","1");
+		}else {
+
+			params.put("channelVersion", channelversion);
+		}
+
+
+		params.put("proxyVersion", OpenSDK.getInstance().getProxyVersion());
+
+		String appInfo = Util.getAppInfo( Data.getInstance().getGameActivity() );
+		params.put("packageName", Util.getJsonStringByName(appInfo, "packageName") );
+		params.put("versionName", Util.getJsonStringByName(appInfo, "versionName") );
+		params.put("versionCode", Util.getJsonStringByName(appInfo, "versionCode") );
+
+		return params;
+
+	}
 
 
 

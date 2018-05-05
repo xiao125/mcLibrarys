@@ -87,7 +87,7 @@ public class WxTools {
 		update_params.put("channel",channel);
 		update_params.put("packagename",packageName);
 		
-		Map<String, String> update_params1 = Util.getSign( update_params , app_secret );
+		Map<String, String> update_params1 = Util.getSigns( update_params , app_secret );
 		update_params1.put("server_name",server_name);
 		update_params1.put("player_name",player_name);
 		update_params1.put("player_type",player_type);
@@ -169,7 +169,7 @@ public class WxTools {
 		update_params.put("channel",channel);
 		update_params.put("packagename",packageName);
 		
-		Map<String, String> update_params1 = Util.getSign( update_params , app_secret );
+		Map<String, String> update_params1 = Util.getSigns( update_params , app_secret );
 		update_params1.put("server_name",server_name);
 		update_params1.put("player_name",player_name);
 		update_params1.put("player_type",player_type);

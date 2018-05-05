@@ -690,7 +690,7 @@ boolean       isExits       = false ;
 	    return false; 
 	}
 	
-public static Map<String, String> getSign( Map<String, String> update_params , String app_secret ){
+public static Map<String,Object> getSign( Map<String, Object> update_params , String app_secret ){
 		
 		String sign = "";
 		
@@ -702,8 +702,8 @@ public static Map<String, String> getSign( Map<String, String> update_params , S
 			}
 		} );
 		
-		for(Map.Entry<String, String> entry:update_params.entrySet()){    
-			update_paramsTmp.put(entry.getKey(), entry.getValue());
+		for(Map.Entry<String, Object> entry:update_params.entrySet()){
+			update_paramsTmp.put(entry.getKey(), entry.getValue().toString());
 		}   
 		
 		int    len = update_paramsTmp.size();
@@ -722,6 +722,46 @@ public static Map<String, String> getSign( Map<String, String> update_params , S
 		update_params.put("sign",Md5Util.getMd5(sign).toLowerCase());
 		return 		update_params;
 	}
+
+
+
+	public static Map<String,String> getSigns( Map<String, String> update_params , String app_secret ){
+
+		String sign = "";
+
+		Map<String, String> update_paramsTmp = new TreeMap<String, String>( new Comparator<String>() {
+
+			public int compare(String arg0, String arg1) {
+				// TODO Auto-generated method stub
+				return arg0.compareTo(arg1);
+			}
+		} );
+
+		for(Map.Entry<String, String> entry:update_params.entrySet()){
+			update_paramsTmp.put(entry.getKey(), entry.getValue());
+		}
+
+		int    len = update_paramsTmp.size();
+		int    count = 0;
+		for(Map.Entry<String, String> entry:update_paramsTmp.entrySet()){
+
+			count++;
+			if(count==len){
+				sign = sign+entry.getKey()+"="+entry.getValue();
+			}else{
+				sign = sign+entry.getKey()+"="+entry.getValue()+"&";
+			}
+
+		}
+		sign = sign+"&app_secret="+app_secret;
+		update_params.put("sign",Md5Util.getMd5(sign).toLowerCase());
+		return 		update_params;
+	}
+
+
+
+
+
 
 	public static String parseMapToString( Map<String, String> params ){
 	

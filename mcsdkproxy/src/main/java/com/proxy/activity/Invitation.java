@@ -159,14 +159,14 @@ public class Invitation extends AppCompatActivity {
 	     Date curDate =  new Date(System.currentTimeMillis());
 	     String   time  =   formatter.format(curDate);
 
-	     HashMap<String,String> params = new HashMap<>();
+	     HashMap<String,Object> params = new HashMap<>();
 
 		params.put("time", String.valueOf(time));	
 		params.put("cdk", ed);
 		params.put("msi", imei);
 		params.put("proxyVersion",PROXY_VERSION);
 		params.put("game_id",gameId);
-		Map<String, String> update_params = Util.getSign( params , app_secret );
+		Map<String, Object> update_params = Util.getSign( params , app_secret );
 
 		LoadingDialog.show(mActivity,"请求中...", true);
 

@@ -823,7 +823,7 @@ public class OpenSDK {
 		params.put("proxyVersion",PROXY_VERSION);
 		params.put("game_id",gameId);
 
-		Map<String, String> update_params1 = Util.getSign( params , app_secret );	
+		Map<String, String> update_params1 = Util.getSigns( params , app_secret );
 		new CommonAsyncTask(mActivity,Constants.URL.ISACTIVATIONS,new BaseListener() {
 			
 			@Override
@@ -878,7 +878,7 @@ public class OpenSDK {
 		params.put("ad_channel",ad_channel);
 		params.put("app_id",app_id);
 		
-		Map<String, String> update_params1 = Util.getSign( params , app_secret );
+		Map<String, String> update_params1 = Util.getSigns( params , app_secret );
 		
 		LogUtil.log(update_params1.toString());
 		new CommonAsyncTask(mActivity,Constants.URL.ACTIVATION, new BaseListener() {

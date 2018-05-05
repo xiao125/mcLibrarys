@@ -48,10 +48,11 @@ public final class RestClientBuilder {
         return this;
     }
 
-    public final RestClientBuilder params(HashMap<String, String> params) {
+    public final RestClientBuilder params(HashMap<String, Object> params) {
         PARAMS.putAll(params);
         return this;
     }
+
 
     public final RestClientBuilder params(String key, Object value) {
         PARAMS.put(key, value);
