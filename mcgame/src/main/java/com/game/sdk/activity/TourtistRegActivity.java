@@ -145,17 +145,14 @@ public class TourtistRegActivity extends Activity implements View.OnClickListene
     //发送手机验证码
     private void initSecCode(String phone){
 
-        HttpService.getSecCode(TourtistRegActivity.this,phone, new ISuccess() {
+        HttpService.getSecCode(phone, new ISuccess() {
             @Override
             public void onSuccess(String response) {
                 LoadingDialog.dismiss();
-
-
             }
         }, new IError() {
             @Override
             public void onError(int code, String msg) {
-
                 LoadingDialog.dismiss();
 
 

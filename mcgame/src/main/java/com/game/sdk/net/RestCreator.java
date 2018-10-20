@@ -2,7 +2,12 @@ package com.game.sdk.net;
 
 import com.game.sdk.configurator.ConfigKeys;
 import com.game.sdk.configurator.MCSDK;
+import com.game.sdk.task.SDK;
 import com.game.sdk.util.KnLog;
+
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.Properties;
 import java.util.WeakHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -41,13 +46,19 @@ public final class RestCreator {
         static final  HttpLoggingInterceptor loggingInterceptor=new HttpLoggingInterceptor(new HttpLoggingInterceptor.Logger() {
             @Override
             public void log(String message) {
-                KnLog.w("OkHttp====Message:"+message);
+                try {
+                    StringReader reader = new StringReader(message);
+                    Properties properties = new Properties();
+                    properties.load(reader);
+                    properties.list(System.out);
+                    KnLog.w("McSdk_Http:"+properties);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         });
 
         private static OkHttpClient.Builder addInterceptor() {
-
-
             return BUILDER;
         }
 
@@ -55,16 +66,8 @@ public final class RestCreator {
 
         private static final OkHttpClient OK_HTTP_CLIENT = addInterceptor()
                 .connectTimeout(TIME_OUT, TimeUnit.SECONDS)
-                /*.addNetworkInterceptor(new Interceptor() { //Okhttp 拦截器
-                    @Override
-                    public Response intercept(Chain chain) throws IOException {
-                       Request request = chain.request();
-                        LogUtil.d("OkHttp====requestMessage:"+request);
-                        Response response = chain.proceed(request);
-                        return response;
-                    }
-                })*/
-                .addNetworkInterceptor(loggingInterceptor.setLevel(level))
+                //.addNetworkInterceptor(loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY))
+                .addInterceptor(loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY))
                 .build();
     }
 
@@ -72,7 +75,9 @@ public final class RestCreator {
      * 构建全局Retrofit客户端
      */
     private static final class RetrofitHolder {
-        private static final String BASE_URL = MCSDK.getConfiguration(ConfigKeys.API_HOST);
+
+       // private static final String BASE_URL = MCSDK.getConfiguration(ConfigKeys.API_HOST);
+        private static final String BASE_URL = SDK.OMD_URL;
         private static final Retrofit RETROFIT_CLIENT = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .client(OKHttpHolder.OK_HTTP_CLIENT)

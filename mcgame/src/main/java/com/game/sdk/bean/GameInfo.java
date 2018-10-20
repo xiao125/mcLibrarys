@@ -7,7 +7,6 @@ public class GameInfo {
 	
 	private String appKey;
 	private String gameName;
-
 	private String gameId;
 	//private String channel = "u7game";
 	private String channel;
@@ -37,9 +36,10 @@ public class GameInfo {
 
 
 	
-	public GameInfo(String appKey, String gameId, String channel,
+	public GameInfo(String gameName,String appKey, String gameId, String channel,
 			String platform, String adChannel, int orientation , String adChannelTxt) {
 		super();
+		this.gameName = gameName;
 		this.appKey = appKey;
 		this.gameId = gameId;
 		this.channel = channel;
@@ -108,7 +108,13 @@ public class GameInfo {
 		this.adChannelTxt = adChannelTxt;
 	}
 
+	public String getGameName() {
+		return gameName;
+	}
 
+	public void setGameName(String gameName) {
+		this.gameName = gameName;
+	}
 
 
 

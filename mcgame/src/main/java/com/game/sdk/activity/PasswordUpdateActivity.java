@@ -54,69 +54,61 @@ public class PasswordUpdateActivity extends Activity implements OnClickListener,
 	private int mCount=60;
 	private Timer mTimer =null;
 
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		super.onCreate(savedInstanceState);
+		m_activity = this ;
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		setContentView(R.layout.mc_password_update);
+		initView();
+		Intent intent = getIntent();
+		va_phone = intent.getStringExtra("phone");
+	}
+
 	@Override
 	public void onClick(View v ) {
-		// TODO Auto-generated method stub
 		int id = v.getId();
 		if(id== R.id.password_update_back){ //返回
-
 			if (m_activity!=null){
-
 				TimerClos();
 				Intent intent1 = new Intent(PasswordUpdateActivity.this,ForgotPasswordActivity.class);
 				startActivity(intent1);
 				m_activity.finish();
 			}
-
-
 		}else if(id==R.id.password_update_submit){ //确定提交
-
 			String cell_num = va_phone; //手机号
 			String security_code = m_code.getText().toString().trim(); //验证码
 			String newPwd  = password_new.getText().toString().trim(); //新密码
 			qdPwd =password_new_ng.getText().toString().trim(); //确定密码
-
-
 			if(!Util.isUserCode(m_activity,security_code)){
-
 				return;
 			}
-
 			if(!Util.isUserPassword(m_activity,newPwd)){
 				return;
 			}
-
 			if (!newPwd.equals(qdPwd)) {
 				Util.ShowTips(m_activity,getResources().getString(R.string.mc_tips_65) );
 				return;
 			}
-
 			if(!Util.isNetWorkAvailable(getApplicationContext())){
 				Util.ShowTips(getApplicationContext(),getResources().getString(R.string.mc_tips_34).toString());
 				return ;
 			}
-
 			newpassword = newPwd;
-
 			KnLog.log("开始更改新密码请求");
 			LoadingDialog.show(m_activity, "请求中...", true);
-
-				//发送更改新密码请求
-		//	HttpService.passwordNewSubmit(m_activity, handler, cell_num , security_code, newpassword,newSdk );
-
+			//发送更改新密码请求
+		    //HttpService.passwordNewSubmit(m_activity, handler, cell_num , security_code, newpassword,newSdk );
             //TODO 修改密码
 			initPsSubmit(cell_num,security_code,newpassword);
 
-
 		}else if(id==R.id.update_code){ //验证码
-
-
 			String cell_Num = va_phone; //手机号
-
 			if (!Util.isUserPhone(m_activity,cell_Num)){
 				return;
 			}
-
 			if(!Util.isNetWorkAvailable(getApplicationContext())){
 				Util.ShowTips(getApplicationContext(),getResources().getString(R.string.mc_tips_34).toString());
 				return ;
@@ -124,79 +116,32 @@ public class PasswordUpdateActivity extends Activity implements OnClickListener,
 			if(null==m_activity){
 
 			}else{
-
-
 				LoadingDialog.show(m_activity, "获取验证码中...", true);
-
 				//TODO 发送手机验证码
 				initSecCode(cell_Num);
-
-
-
-
 			}
-			
 		}else if (id==R.id.passwd_select_login_close){
-
 			/*if (m_activity!=null){
 				m_activity.finish();
 				m_activity=null;
 			}*/
 		}
-
-
-
 	}
-
-
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
-		super.onCreate(savedInstanceState);
-		
-		m_activity = this ;
-		
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		
-		if(GameSDK.getInstance().ismScreenSensor()){
-			
-		}else{
-			setRequestedOrientation(GameSDK.getInstance().getmOrientation());
-		}
-		
-		setContentView(R.layout.mc_password_update);
-
-
-		initView();
-
-
-		Intent intent = getIntent();
-		va_phone = intent.getStringExtra("phone");
-
-		
-	}
-
-
 
 	private void initView() {
-
 		m_code = (EditText) findViewById(R.id.phone_code); //验证码
 		password_new = (EditText) findViewById(R.id.password_new); //新密码
 		password_new_ng = (EditText) findViewById(R.id.password_new_ng); //确认密码
-
 		m_password_update_back = (ImageView) findViewById(R.id.password_update_back);//返回
 		m_select_login_close= (ImageView) findViewById(R.id.passwd_select_login_close);//关闭
 		m_password_update_submit= (Button) findViewById(R.id.password_update_submit); //确定
 		m_update_code= (Button) findViewById(R.id.update_code); //验证码
-
 		m_code.setOnClickListener(this);
 		m_select_login_close.setOnClickListener(this);
 		m_password_update_back.setOnClickListener(this);
 		m_select_login_close.setOnClickListener(this);
 		m_update_code.setOnClickListener(this);
 		m_password_update_submit.setOnClickListener(this);
-
-
 		//全屏，进入输入用户名
 		m_code.setOnClickListener( new OnClickListener() {
 
@@ -222,7 +167,6 @@ public class PasswordUpdateActivity extends Activity implements OnClickListener,
 			}
 		} );
 
-
 	}
 
 
@@ -230,49 +174,37 @@ public class PasswordUpdateActivity extends Activity implements OnClickListener,
 	protected void onResume() {
 		// TODO Auto-generated method stub
 		super.onResume();
-		if(GameSDK.getInstance().getGameInfo().getOrientation() == Constants.LANDSCAPE){
+		/*if(GameSDK.getInstance().getGameInfo().getOrientation() == Constants.LANDSCAPE){
 			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 		}else{
 			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-		}
+		}*/
 	}
 
 
 	//发送手机验证码
 	private void initSecCode(String phone){
 
-		HttpService.getSecCode(PasswordUpdateActivity.this,phone, new ISuccess() {
+		HttpService.getSecCode(phone, new ISuccess() {
 			@Override
 			public void onSuccess(String response) {
 				LoadingDialog.dismiss();
-
 				KnLog.log("获取手机验证码接口========"+JSON.parseObject(response));
 				final int code = JSON.parseObject(response).getIntValue("code");
 				switch (code){
 					case ResultCode.SUCCESS: //成功
-
 						initTimer();
-
 						break;
-
 					default: //失败
-
 						Util.ShowTips(PasswordUpdateActivity.this,JSON.parseObject(response).getString("reason") );
 						break;
-
 				}
-
-
-
 			}
 		}, new IError() {
 			@Override
 			public void onError(int code, String msg) {
-
 				LoadingDialog.dismiss();
-
-				Util.ShowTips(m_activity,"服务器响应失败了！");
-
+				Util.ShowTips(m_activity,"服务器响应失败了！code:"+code+"  msg:"+msg);
 			}
 		});
 
@@ -283,48 +215,33 @@ public class PasswordUpdateActivity extends Activity implements OnClickListener,
 
 	//修改密码
 	private void initPsSubmit(String phone,String security_code, final String newpassword){
-
-
 		HttpService.passwordNewSubmit(phone, security_code, newpassword, new ISuccess() {
 			@Override
 			public void onSuccess(String response) {
-
 				LoadingDialog.dismiss();
-
 				final int code = JSON.parseObject(response).getIntValue("code");
-
 				switch (code) {
 					case ResultCode.SUCCESS: //成功
-
 						KnLog.log("=========修改密码成功+======："+JSON.parseObject(response));
-
 							String reason = JSON.parseObject(response).getString("reason");
 							String user_name = JSON.parseObject(response).getString("user_name");
-
 							Util.ShowTips(m_activity,reason);
 							DBHelper.getInstance().insertOrUpdateUser(user_name ,newpassword ); //账号密码保存本地数据库
-
 							Intent intent1=new Intent(PasswordUpdateActivity.this, AutoLoginActivity.class);
 							intent1.putExtra("userName", user_name);
 							intent1.putExtra("password",qdPwd);
 
 						if(null==m_activity){
 
-					     	}else{
-
+						}else{
 							TimerClos();
 							m_activity.startActivity(intent1);
 							m_activity.finish();
 							m_activity = null ;
-
 						}
-
 						break;
-
 					default:
-
 						Util.ShowTips(m_activity,JSON.parseObject(response).getString("reason"));
-
 						break;
 				}
 
@@ -335,6 +252,7 @@ public class PasswordUpdateActivity extends Activity implements OnClickListener,
 			@Override
 			public void onError(int code, String msg) {
 				LoadingDialog.dismiss();
+				Util.ShowTips(m_activity,"服务器相应失败! code:"+code+"  msg:"+msg);
 			}
 		});
 

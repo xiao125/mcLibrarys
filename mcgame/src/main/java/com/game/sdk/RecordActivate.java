@@ -1,6 +1,8 @@
 package com.game.sdk;
 
 
+import android.content.Context;
+
 import com.alibaba.fastjson.JSON;
 import com.game.sdk.net.callback.IError;
 import com.game.sdk.net.callback.ISuccess;
@@ -14,9 +16,7 @@ import com.game.sdk.util.KnLog;
 
 public class RecordActivate {
 
-
     private static RecordActivate inst=null;
-
     public static RecordActivate getInstance(){
         if (inst==null){
             inst = new RecordActivate();
@@ -24,12 +24,10 @@ public class RecordActivate {
         return inst;
     }
 
-
-
-    public void initrecordActivate(){
+    public void initrecordActivate(Context context){
 
         //设备激活
-        HttpService.recordActivate(new ISuccess() {
+        HttpService.recordActivate(context, new ISuccess() {
             @Override
             public void onSuccess(String response) {
                 final int code = JSON.parseObject(response).getIntValue("code");

@@ -9,6 +9,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -26,7 +27,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -765,7 +768,22 @@ public class Util {
 
 	}
 
+	//获取当前时间
+	public static String getTimes(){
+		//获取随机有户名
+		SimpleDateFormat formatter   =   new   SimpleDateFormat("yyyyMMddHHmmss");
+		Date curDate =  new Date(System.currentTimeMillis());
+		String   time  =   formatter.format(curDate);
+		return  time;
+	}
 
+	//获取手机分辨率
+	public static String  ImageGalleryAdapter(Context c) {
+		DisplayMetrics dm = c.getResources().getDisplayMetrics();
+		int screenWidth = dm.widthPixels;
+		int screenHeight = dm.heightPixels;
+		return  screenWidth+"/"+ screenHeight;
+	}
 
 
 }

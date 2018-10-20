@@ -54,24 +54,11 @@ public class FirstLoginActivity extends Activity implements OnClickListener {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
 		activity = this ;
-		
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		
-		if(GameSDK.getInstance().ismScreenSensor()){
-	
-		}else{
-			setRequestedOrientation(GameSDK.getInstance().getmOrientation());
-		}
-		
 		setContentView(R.layout.mc_first_login_new);
-
 		initView();
-
 		initLinerter();
-
-
 		
 		Intent intent = getIntent();
 		if(intent.hasExtra("userName")){
@@ -89,15 +76,11 @@ public class FirstLoginActivity extends Activity implements OnClickListener {
 
 		//返回
 		image_back.setOnClickListener(new OnClickListener() {
-
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
-
 				if(null==activity){
 
 				}else {
-
 					Intent intent1 = new Intent(activity, SelecteLoginActivity.class);
 					activity.startActivity(intent1);
 					activity.finish();
@@ -158,8 +141,6 @@ public class FirstLoginActivity extends Activity implements OnClickListener {
 				return false;
 			}
 		} );
-
-
 	}
 
 	private void initView() {
@@ -170,23 +151,9 @@ public class FirstLoginActivity extends Activity implements OnClickListener {
 		update_Password= (TextView) findViewById(R.id.update_Password); //忘记密码
 		login_bt = (Button) findViewById(R.id.login_bt); //登录
 		new_account_bt = (TextView) findViewById(R.id.new_account_bt);
-
 		login_bt.setOnClickListener(this);
 		new_account_bt.setOnClickListener(this);
 		update_Password.setOnClickListener(this);
-
-
-	}
-
-	@Override
-	protected void onResume() {
-		super.onResume();
-		// 0为横屏 ， 1为竖屏
-		if(GameSDK.getInstance().getGameInfo().getOrientation() == Constants.LANDSCAPE){
-			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-		}else{
-			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-		}
 	}
 	
 	@Override
@@ -198,10 +165,7 @@ public class FirstLoginActivity extends Activity implements OnClickListener {
 
 			Util.hideEditTextWindow(this, passWordEt);
 			Util.hideEditTextWindow(this, userNameEt);
-
 			checkAccountBindParams(activity, userNameEt, passWordEt);
-
-
 			/*Util.hideEditTextWindow(this, passWordEt);
 			checkLoginParams(FirstLoginActivity.this, userNameEt, passWordEt);*/
 			KnLog.log("login End");
@@ -211,17 +175,10 @@ public class FirstLoginActivity extends Activity implements OnClickListener {
 			KnLog.log("new_account_bt");
 			Util.hideEditTextWindow(this, passWordEt);
 			//GameSDK.getInstance().register(FirstLoginActivity.this , true); //跳转到注册界面
-
 			GameSDK.getInstance().KsRegister(FirstLoginActivity.this,true); //跳转到快速注册界面
-
 		}else if (id == R.id.update_Password){ //忘记密码
-
-
 				GameSDK.getInstance().Update_password(FirstLoginActivity.this,true); //修改密码
 				activity.finish();
-
-
-
 		} else{
 			KnLog.log("forget_password null ");
 			return ;
@@ -232,24 +189,17 @@ public class FirstLoginActivity extends Activity implements OnClickListener {
 
 	//判断账号密码输入格式
 	private void checkAccountBindParams(Activity context, EditText mUsername, EditText mPassword) {
-
 		String username = mUsername.getText().toString();
 		String password = mPassword.getText().toString();
-
-
 		if(TextUtils.isEmpty(username)){
 			Util.ShowTips(activity,getResources().getString(R.string.mc_tips_100));
 			return ;
 		}
-
 		//KnLog.log("判断是否手机号："+ismobile(context, username));
 
 		//不是手机号
 		if (ismobile(context, username)) return;
-
-
 		if(!Util.isName(context,username)){
-
 			return;
 		}
 
@@ -262,38 +212,25 @@ public class FirstLoginActivity extends Activity implements OnClickListener {
 		//查询账号是否存在
 		//HttpService.getUsername(activity.getApplicationContext(), handler,username);
 
-
 		//直接登录
 		m_userName = username ;
 		m_password = password;
 		KnLog.log("输入账号登录username="+username+" password="+password);
-
 		LoadingDialog.show(activity, "登录中...",true);
-
 		//TODO 账号登录
 		initLogin(username,password);
-
-
-
-
 	}
 
 
 	private boolean ismobile(Activity context, String username) {
 		if(!Util.isMobileNO(username)) { //如果不是手机号
 			//Util.ShowTips(m_activity, getResources().getString(R.string.tips_57)); //如果不是手机号
-
 			if(!Util.isName(context,username)){
-
 				return true;
 			}
-
 		}
 		return false;
 	}
-
-
-
 
 	//用户登录
 	private void initLogin(final String muserName,final String mpassWord){
@@ -310,13 +247,10 @@ public class FirstLoginActivity extends Activity implements OnClickListener {
 						Util.ShowTips(activity,"登录成功！");
 						activity.finish();
 						activity=null;
-
-
 						break;
 
 					case ResultCode.NONEXISTENT: //账号不存在
 						//Util.ShowTips(activity,"账号不存在!");
-
 						//提示绑定手机弹窗
 						LayoutInflater inflater = LayoutInflater.from(activity);
 						View v = inflater.inflate(R.layout.mc_bind_mobile_dialog, null);
@@ -363,35 +297,21 @@ public class FirstLoginActivity extends Activity implements OnClickListener {
 								if(null==activity){
 
 								}else{
-
-
 									dia.dismiss();
-
-
 								}
-
-
 							}
 						});
-
-
 						break;
 					default:
-
 						Util.ShowTips(activity,JSON.parseObject(response).getString("reason"));
 						break;
 				}
-
 			}
 		}, new IError() {
 			@Override
 			public void onError(int code, String msg) {
-
 				LoadingDialog.dismiss();
-
 				Util.ShowTips(activity,"请求服务器失败!");
-
-
 			}
 		});
 	}

@@ -45,33 +45,21 @@ public class StartWebView extends Activity {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);// 去掉应用标题
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
-		if(GameSDK.getInstance().ismScreenSensor()){
-
-		}else{
-			setRequestedOrientation(GameSDK.getInstance().getmOrientation());
-		}
 		setContentView(R.layout.mc_activity_startweb_layout);
-
-
-
 
 		tv_back =  (TextView) findViewById(R.id.tv_back_id);
 		tv_back.setOnClickListener(new OnClickListener() {
-
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
 				finish();
 			}
 		});
 
+		//获取传递的url
 		m_url = getIntent().getExtras().getString("url");
 		m_wxUrl = getIntent().getExtras().getString("wxUrl");
 		KnLog.e("url:" + m_url+"  wxUrl="+m_wxUrl);
-
 		LoadingDialog.show(m_activity, "请稍等...", true);
-
 		if (DeviceUtil.isFastMobileNetwork(m_activity)
 				|| DeviceUtil.isWifi(m_activity)) {
 			// 高速网络忽略
@@ -81,32 +69,22 @@ public class StartWebView extends Activity {
 			KnLog.e("非高速网络");
 			final Handler handler = new Handler();
 			handler.postDelayed(new Runnable() {
-
 				public void run() {
 					waitdialog.dismiss();
 				}
-
 			}, 3000);
 		}
-
-
 		initView();
-
 		initwebView();
-
 	}
 
 
 	private void initView(){
-
 		webView = (WebView) findViewById(R.id.webView);
-
-
 	}
 
 
 	private void initwebView(){
-
 		WebSettings ws = webView.getSettings();
 		ws.setBuiltInZoomControls(true);// 隐藏缩放按钮
 		ws.setUseWideViewPort(true);// 可任意比例缩放
@@ -117,17 +95,12 @@ public class StartWebView extends Activity {
 		ws.setSupportMultipleWindows(true);// 新加
 		// 如果访问的页面中要与Javascript交互，则webview必须设置支持Javascript
 		ws.setJavaScriptEnabled(true);
-
 		webView.setWebViewClient(new mwebViewClient()); //webView加载支付总页面
-
 		webView.addJavascriptInterface(JsInterface, "JsInterface");
 		JsInterface.setWvClientClickListener(new MyWebViewClient());// 这里就是js调用java端的具体实现
 		webView.getSettings().setJavaScriptEnabled(true);
 		webView.getSettings().setDomStorageEnabled(true);
-
 		webView.loadUrl(m_url);
-
-
 	}
 
 
@@ -135,23 +108,22 @@ public class StartWebView extends Activity {
 	public class mwebViewClient extends WebViewClient {
 		@Override
 		public boolean shouldOverrideUrlLoading(WebView view, String url) {
-			KnLog.e("shouldOverrideUrlLoading  url = " + url);
-
-			// 如下方案可在非微信内部WebView的H5页面中调出微信支付
-			if (url.startsWith("weixin://wap/pay?")){
+			KnLog.log("拦截url:" + url);
+			if (url.startsWith("weixin://wap/pay?")) {
+				KnLog.log("微信支付拦截回调");
 				Intent intent = new Intent();
 				intent.setAction(Intent.ACTION_VIEW);
 				intent.setData(Uri.parse(url));
 				startActivity(intent);
 				return true;
-			}else {
-
-				//请求头
-				Map extraHeaders = new HashMap();
-				extraHeaders.put("Referer","https://pay.ipaynow.cn");
-				view.loadUrl(url,extraHeaders);
+			} else if (url.startsWith("alipays://")) {
+				KnLog.log("支付包拦截回调");
+				Intent intent = new Intent();
+				intent.setAction(Intent.ACTION_VIEW);
+				intent.setData(Uri.parse(url));
+				startActivity(intent);
+				return true;
 			}
-
 			return super.shouldOverrideUrlLoading(view, url);
 		}
 
@@ -175,23 +147,18 @@ public class StartWebView extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-
 		if (webView != null) {
-
 			webView.onResume();
 			webView.resumeTimers();
-
 		}
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
-
 		if (webView != null) {
 			webView.onPause();
 			webView.pauseTimers();
-
 		}
 	}
 
@@ -208,7 +175,6 @@ public class StartWebView extends Activity {
 
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
-
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
 			KnLog.e("返回++");
 			StartWebView.this.finish();
@@ -216,20 +182,13 @@ public class StartWebView extends Activity {
 		return false;
 	}
 
-
-
 	class MyWebViewClient implements com.game.sdk.util.JsInterface.wvClientClickListener {
-
-
 		@Override
 		public void wvHasClickEnvent(String title, String content, String imageUrl, String url) {
-
-
 		}
 
 		@Override
 		public void wvCloseWebEvent() {
-
 			KnLog.log("关闭支付页面");
 			m_activity.finish();
 			m_activity = null;
@@ -237,20 +196,11 @@ public class StartWebView extends Activity {
 
 		@Override
 		public void wvWxWebPayEvent() {
-
 			KnLog.e("浏览器打开微信支付页面");
 			webView.loadUrl(m_wxUrl);
 			Map extraHeaders = new HashMap();
 			extraHeaders.put("Referer", "https://pay.ipaynow.cn");//例如 http://www.baidu.com
 			webView.loadUrl(m_wxUrl, extraHeaders);//targetUrl为微信下单地址
-
 		}
 	}
-
-
-
-
-
-
-
 }

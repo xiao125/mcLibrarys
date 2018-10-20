@@ -32,13 +32,9 @@ public class LoadingDialog {
 			boolean cancelable) {
 		
 		dismiss();
-		
 		if(null==activity){
-			
 			return null;
-			
 		}else{
-			
 			LayoutInflater inflater = LayoutInflater.from(activity);
 			View v = inflater.inflate(R.layout.mc_loading_dialog, null);
 			LinearLayout layout = (LinearLayout) v.findViewById(R.id.dialog_view);

@@ -12,7 +12,7 @@ public class SDK {
 
 
 	//public static final String OMD_URL = "pay.u7game.cn";
-	public static final String OMD_URL = "oms.u7game.cn";
+	public static final String OMD_URL = "http://oms.u7game.cn";
 
 
 	public static String LOGIN_URL = "http://"+OMD_URL+"/api/login_check.php"; //登录
@@ -59,6 +59,7 @@ public class SDK {
 		public static String ENTER_GAME="/api/sendlv.php";//上报游戏信息
 		public static String UPDATE_PASSWORD_URL ="/api/find_pwd.php"; //根据手机验证码更改新密码
 		public static String GET_USER_NAME="/api/get_user_name.php"; //验证账号是否存在
+		public static String CANCEL="/api/open_platform/datacenter/cancel.php";//注销接口
 
 	}
 

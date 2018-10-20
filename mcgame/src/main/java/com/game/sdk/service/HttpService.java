@@ -26,6 +26,7 @@ import com.game.sdk.task.QueryMsiBindAsyncTask;
 import com.game.sdk.task.VisitorAccountBindAsyncTask;
 import com.game.sdk.task.VisitorAsyncTask;
 import com.game.sdk.task.VisitorBindMobileAsyncTask;
+import com.game.sdk.util.BuildHelper;
 import com.game.sdk.util.DBHelper;
 import com.game.sdk.util.DeviceUtil;
 import com.game.sdk.util.KnLog;
@@ -34,8 +35,13 @@ import com.game.sdk.util.Md5Util;
 import com.game.sdk.util.Util;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -44,42 +50,30 @@ public class HttpService {
 	private static final String PROXY_VERSION = "1.0.1" ;
 	private static final String reg_key="kuniu@!#2014";
 
-
 	//查询账号是否绑定手机号
 	public static void queryBindAccont(String user_Name, final ISuccess iSuccess, IError iError ){
 
 		try {
-
-			GameInfo gameInfo = GameSDK.getInstance().getGameInfo();
-			String appInfo = Util.getAppInfo( GameSDK.getInstance().getActivity() );
-			String app_id     = "1011";
+			HashMap<String,String> update_params = getCommonParams();
 			String app_secret = "3d759cba73b253080543f8311b6030bf";
-			String versionCode ="";
-			String gameName = gameInfo.getGameId() ;
-
-			HashMap<String,String> update_params = new HashMap<>();
-
+			String versionCode = PROXY_VERSION;
 			JSONObject content = new JSONObject();
 			content.put("user_name",user_Name);
 			update_params.put("content", content.toString());
 			update_params.put("proxyVersion", versionCode);
-			update_params.put("game", gameName);
-			update_params.put("app_id",app_id);
-			update_params.put("sign", Md5Util.getMd5(content + GameSDK.getInstance().getGameInfo().getRegKey())); //这个接口验签必须是md5
+			HashMap<String, String> update_params1 = Util.getSign( update_params , app_secret );
 
-         //{"code":"-1","reason":"该帐号没有绑定手机"}
+			//update_params.put("sign", Md5Util.getMd5(content + GameSDK.getInstance().getGameInfo().getRegKey())); //这个接口验签必须是md5
+            //{"code":"-1","reason":"该帐号没有绑定手机"}
 
 			//网络请求
 			RestClient.builder()
 					.url(SDK.URL.QUERY_ACCOUNT_BIND)
-					.params(update_params)
+					.params(update_params1)
 					.success(iSuccess)
 					.error(iError)
 					.build()
 					.post();
-
-
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -89,14 +83,13 @@ public class HttpService {
 
 	//验证账号是否存在
 	public static void getUsername(String user_Name,ISuccess iSuccess,IError iError){
-
 		try {
-			HashMap<String , String> params = new HashMap<>();
+			HashMap<String , String> params = getCommonParams();
 			JSONObject content = new JSONObject();
 			content.put("user_name",user_Name);
 			params.put("content", content.toString());
+			params.put("proxyVersion", "1.0.0");
 			params.put("sign", Md5Util.getMd5(content + GameSDK.getInstance().getGameInfo().getRegKey())); //这个接口验签必须是md5
-
 			//网络请求
 			RestClient.builder()
 					.url(SDK.URL.GET_USER_NAME)
@@ -112,15 +105,9 @@ public class HttpService {
 
 	}
 
-
-
-
-
-
 	//游客绑定账号
 	public static void visitorBindAccount( Context applicationContext, Handler handler,
 			String username, String password ){
-		
 		String gameId = GameSDK.getInstance().getGameInfo().getGameId() ;
 		String channel = GameSDK.getInstance().getGameInfo().getChannel();
 		String platform = GameSDK.getInstance().getGameInfo().getPlatform() ;
@@ -129,10 +116,8 @@ public class HttpService {
 		String appInfo = Util.getAppInfo( GameSDK.getInstance().getActivity() );
 //		String proxy_version = KnUtil.getJsonStringByName(appInfo, "versionCode") ;
 		String proxy_version = PROXY_VERSION ;
-		
 		String app_id     = "1011";
 		String app_secret = "3d759cba73b253080543f8311b6030bf";
-		
 		Map<String, String> update_params = new TreeMap<String, String>( new Comparator<String>() {
 
 			@Override
@@ -141,7 +126,6 @@ public class HttpService {
 				return arg0.compareTo(arg1);
 			}
 		} );
-		
 		JSONObject content = new JSONObject();
 		try {
 			content.put("user_name",username);
@@ -150,22 +134,16 @@ public class HttpService {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
 		update_params.put("content", content.toString());
-		
 		update_params.put("game_id",gameId);
 		update_params.put("channel",channel);
 		update_params.put("platform",platform);
 		update_params.put("ad_channel",ad_channel);
 		update_params.put("msi",imei);
 		update_params.put("proxyVersion",proxy_version);
-		
 		Map<String, String> update_params1 = Util.getSign( update_params , app_secret );
-		
 		new VisitorAccountBindAsyncTask(applicationContext, handler, SDK.VISITOR_ACCOUNT_BIND)
 				.execute(new Map[] { update_params1, null, null });
-		
-		
 	}
 
 	//游客登录
@@ -206,28 +184,22 @@ public class HttpService {
 		
 	}
 
-
-
 	//获取验证码请求
-	public static void getSecCode(final Context context, String mobile,  final ISuccess iSuccess,final IError iError ){
+	public static void getSecCode(String mobile,ISuccess iSuccess,IError iError ){
 		try {
-
-			GameInfo gameInfo = GameSDK.getInstance().getGameInfo();
-			HashMap<String , String> update_params = new HashMap<String, String>();
-			String app_id     = "1011";
-			String versionCode ="" ;
-			String gameName = gameInfo.getGameId() ;
+			HashMap<String,String> update_params = getCommonParams();
+			String app_secret = "3d759cba73b253080543f8311b6030bf";
+			String versionCode = PROXY_VERSION ;
 			JSONObject content = new JSONObject();
 			content.put("mobile",mobile);
 			update_params.put("content", content.toString());
 			update_params.put("proxyVersion", versionCode);
-			update_params.put("game", gameName);
-			update_params.put("app_id",app_id);
-			update_params.put("sign", Md5Util.getMd5(content+GameSDK.getInstance().getGameInfo().getRegKey()));
+			//update_params.put("sign", Md5Util.getMd5(content+GameSDK.getInstance().getGameInfo().getRegKey()));
+			HashMap<String, String> update_params1 = Util.getSign( update_params , app_secret );
 			//网络请求
 			RestClient.builder()
 					.url(SDK.URL.GET_RESURITY_CODE_URL)
-					.params(update_params)
+					.params(update_params1)
 					.success(iSuccess)
 					.error(iError)
 					.build()
@@ -240,38 +212,26 @@ public class HttpService {
 
 	}
 
-
-
 	//绑定手机请求
 	public static void bindMobile(String mobile , String security_code , String user_Name, final ISuccess iSuccess, final IError iError ){
 
 		try {
-
-			GameInfo gameInfo = GameSDK.getInstance().getGameInfo();
-			String app_id     = "1011";
-			String versionCode ="";
-			String gameName = gameInfo.getGameId() ;
-			String imei = DeviceUtil.getDeviceId();
-
-			HashMap<String, String> update_params =new HashMap<>();
-
+			HashMap<String,String> update_params = getCommonParams();
+			String app_secret = "3d759cba73b253080543f8311b6030bf";
+			String versionCode = PROXY_VERSION ;
 			JSONObject content = new JSONObject();
 			content.put("mobile",mobile);
 			content.put("user_name",user_Name);
 			content.put("rand_code",security_code);
 			update_params.put("content", content.toString());
 			update_params.put("proxyVersion", versionCode);
-			update_params.put("game", gameName);
-			update_params.put("msi",imei);
-			update_params.put("app_id",app_id);
-
-			update_params.put("sign", Md5Util.getMd5(content+GameSDK.getInstance().getGameInfo().getRegKey()));
-
+			HashMap<String, String> update_params1 = Util.getSign( update_params , app_secret );
+			//update_params.put("sign", Md5Util.getMd5(content+GameSDK.getInstance().getGameInfo().getRegKey()));
 
 			//网络请求
 			RestClient.builder()
 					.url(SDK.URL.BIND_MOBILE_URL)
-					.params(update_params)
+					.params(update_params1)
 					.success(iSuccess)
 					.error(iError)
 					.build()
@@ -283,18 +243,10 @@ public class HttpService {
 
 	}
 
-
-
-
-
-
-
-
 	//游客绑定手机
 	public static void visitorbindMobile( Context applicationContext, Handler handler, String mobile , String security_code , String user_Name,String user_Password ){
 
 		try {
-
 			GameInfo gameInfo = GameSDK.getInstance().getGameInfo();
 			String appInfo = Util.getAppInfo( GameSDK.getInstance().getActivity() );
 			String app_id     = "1011";
@@ -306,7 +258,6 @@ public class HttpService {
 			String channel = gameInfo.getChannel();
 			String ad_channel = gameInfo.getAdChannel();
 			String platform = gameInfo.getPlatform();
-
 			Map<String, String> update_params = new TreeMap<String, String>( new Comparator<String>() {
 
 				@Override
@@ -344,20 +295,17 @@ public class HttpService {
 	public static void RandUserName(String time, final ISuccess iSuccess, final IError iError ){
 
 		try {
-
-			String app_id     = "1011";
 			String app_secret = "3d759cba73b253080543f8311b6030bf";
-			String versionCode ="";
-            String reg_key="kuniu@!#2014";
+			String versionCode = PROXY_VERSION ;
 			HashMap<String,String> update_params = new HashMap<>();
 			update_params.put("time",time);
 			update_params.put("proxyVersion", versionCode);
-			update_params.put("sign", Md5Util.getMd5(time+reg_key));
-
+			HashMap<String, String> update_params1 = Util.getSign( update_params , app_secret );
+			//update_params.put("sign", Md5Util.getMd5(time+reg_key));
 			//网络请求
 			RestClient.builder()
 					.url(SDK.URL.RAND_USER_NAME)
-					.params(update_params)
+					.params(update_params1)
 					.success(iSuccess)
 					.error(iError)
 					.build()
@@ -369,34 +317,22 @@ public class HttpService {
 
 	}
 
-
-
-
-
 	//设备激活
-	public static void  recordActivate(ISuccess iSuccess,IError iError){
+	public static void  recordActivate(Context applicationContext,ISuccess iSuccess,IError iError){
 
 		try {
-
 			HashMap<String , String> params = getCommonParams();
-
-			GameInfo gameInfo = GameSDK.getInstance().getGameInfo();
-			String gameId = gameInfo.getGameId() ;
-			String imei = DeviceUtil.getDeviceId();
-			String phonetype =  DeviceUtil.getPhoneType();
-			String appkey= String.valueOf(System.currentTimeMillis());//自定义，没有明确指定
-			params.put("app_key",appkey);
-			params.put("phone_Type",phonetype);//手机类型
-			params.put("proxyVersion","");
-
-			KnLog.log("appkey");
-
-			params.put("sign", Md5Util.getMd5(gameId+appkey+imei));
+			String app_secret = "3d759cba73b253080543f8311b6030bf";
+			String versionCode = PROXY_VERSION ;
+			params.put("proxyVersion",versionCode);
+			String DisplayMetrics = Util.ImageGalleryAdapter(applicationContext);
+			params.put("RP",DisplayMetrics); //当前手机分辨率
+			HashMap<String, String> update_params1 = Util.getSign(params ,app_secret );
 
 			//网络请求
 			RestClient.builder()
 					.url(SDK.URL.RECORD_ACTIVATE)
-					.params(params)
+					.params(update_params1)
 					.success(iSuccess)
 					.error(iError)
 					.build()
@@ -408,27 +344,21 @@ public class HttpService {
 
 	}
 
-
-
-
 	public static void getAccountSubmit( Context applicationContext, Handler handler, String mobile , String security_code ){
 	
 		try {
-			
 			GameInfo gameInfo = GameSDK.getInstance().getGameInfo();
 			String appInfo = Util.getAppInfo( GameSDK.getInstance().getActivity() );
 			String app_id     = "1011";
 			String app_secret = "3d759cba73b253080543f8311b6030bf";
 			String versionCode = Util.getJsonStringByName(appInfo, "versionCode") ;
 //			String versionCode = PROXY_VERSION ;
-			String gameName = gameInfo.getGameId() ; 
-			
+			String gameName = gameInfo.getGameId() ;
 			Map<String, String> update_params = new TreeMap<String, String>( new Comparator<String>() {
 
 				@Override
 				public int compare(String arg0, String arg1) {
 					// TODO Auto-generated method stub
-					
 					return arg0.compareTo(arg1);
 				}
 			} );
@@ -457,20 +387,23 @@ public class HttpService {
 										 ISuccess iSuccess,IError iError){
 
 		try {
-			String versionCode = "" ;
-			HashMap<String,String> update_params = new HashMap<>();
+			HashMap<String , String> update_params = getCommonParams();
+			String app_secret = "3d759cba73b253080543f8311b6030bf";
+			String versionCode = PROXY_VERSION ;
 			JSONObject content = new JSONObject();
 			content.put("mobile",mobile);
 			content.put("pwd_new",new_password);
 			content.put("rand_code",security_code);
 			update_params.put("content", content.toString());
+			update_params.put("newSdk", "1");//区分sdk
 			update_params.put("proxyVersion", versionCode);
-			update_params.put("sign", Md5Util.getMd5(content.toString()+GameSDK.getInstance().getGameInfo().getRegKey()));
+			HashMap<String, String> update_params1 = Util.getSign( update_params , app_secret );
+			//update_params.put("sign", Md5Util.getMd5(content.toString()+GameSDK.getInstance().getGameInfo().getRegKey()));
 
 			//网络请求
 			RestClient.builder()
 					.url(SDK.URL.UPDATE_PASSWORD_URL)
-					.params(update_params)
+					.params(update_params1)
 					.success(iSuccess)
 					.error(iError)
 					.build()
@@ -488,32 +421,25 @@ public class HttpService {
 	public static void doLogin(String username, String password, final ISuccess iSuccess, IError iError) {
 
 		try {
-			GameInfo gameInfo = GameSDK.getInstance().getGameInfo();
-
 			final HashMap<String , String> params = getCommonParams();
-
-			String game_id = gameInfo.getGameId();
-			String platform = gameInfo.getPlatform();
-			String channel = gameInfo.getChannel();
-			Log.d("ttt",platform);
-			Log.d("ttt",game_id);
+			String app_secret = "3d759cba73b253080543f8311b6030bf";
 			final JSONObject content = new JSONObject();
 			content.put("user_name", username);
 			content.put("passwd", password);
 			params.put("content", content.toString());
-			params.put(
+			String versionCode = PROXY_VERSION ;
+			params.put("proxyVersion",versionCode);
+			/*params.put(
 					"sign",
 					Md5Util.getMd5(game_id + channel
 							+ platform + content.toString()
-							+ gameInfo.getAppKey()));
-
-			KnLog.log(" login push the data "+gameInfo.getAppKey());
-
+							+ gameInfo.getAppKey()));*/
+			HashMap<String, String> update_params = Util.getSign(params ,app_secret );
             //{"code":"0","open_id":"c0745cbc52e5e2802f8b7e49ce0f101a","reason":"登录成功!","is_bind_mobile":"0","isSwitch":0,"sign":"d362909ee120459a13f8edf71055f910","sid":"ffdad7841411fd0e2bcfec3bf1adff1d","iscompany":0,"invite":{"code":0,"reason":"ok"},"extra_info":{"isLogState":0}}
 			//网络请求
 			RestClient.builder()
 					.url(SDK.URL.LOGIN_URL)
-					.params(params)
+					.params(update_params)
 					.success(new ISuccess() {
 						@Override
 						public void onSuccess(String response) {
@@ -521,7 +447,6 @@ public class HttpService {
 
 							switch (code) {
 								case ResultCode.SUCCESS: //成功
-
 									if (GameSDK.getInstance().getmLoginListener() != null) {
 										GameSDK.getInstance().getmLoginListener().onSuccess(response.toString());
 									}
@@ -531,34 +456,24 @@ public class HttpService {
 									final String user_name = JSON.parseObject(content.toString()).getString("user_name");
 									final String passwd = JSON.parseObject(content.toString()).getString("passwd");
 
-
 									UserInfo userInfo = new UserInfo();
 									userInfo.setOpenId(open_id);
 									userInfo.setSid(sid);
 									userInfo.setUsername(user_name);
 									userInfo.setLogin(true);
 									GameSDK.getInstance().setUserInfo(userInfo);
-
-									KnLog.log("=========登录成功后-=====账号："+user_name+" 密码="+passwd);
 									//登录成功之后就保存账号密码
-									DBHelper.getInstance().insertOrUpdateUser( userInfo.getUsername() , passwd);
-
+									DBHelper.getInstance().insertOrUpdateUser( user_name , passwd);
 									iSuccess.onSuccess(response);
-
 									break;
 
 								default:
-
 									if (GameSDK.getInstance().getmLoginListener() != null) {
 										GameSDK.getInstance().getmLoginListener().onFail(response.toString());
 									}
 									iSuccess.onSuccess(response);
-
-
 									break;
 							}
-
-
 						}
 					})
 					.error(iError)
@@ -579,17 +494,18 @@ public class HttpService {
 			JSONObject obj = new JSONObject();
 			obj.put("user_name", username);
 			obj.put("passwd", password);
-
 			String content = obj.toString();
 			params.put("content", content);
-			params.put("sign", Md5Util.getMd5(content + GameSDK.getInstance().getGameInfo().getRegKey()));
-
-
+			String app_secret = "3d759cba73b253080543f8311b6030bf";
+			String versionCode = PROXY_VERSION ;
+			params.put("proxyVersion",versionCode);
+			HashMap<String, String> update_params = Util.getSign(params ,app_secret );
+			//params.put("sign", Md5Util.getMd5(content + GameSDK.getInstance().getGameInfo().getRegKey()));
 			//返回 {"code":"0","reason":"注册成功"}
 			//网络请求
 			RestClient.builder()
 					.url(SDK.URL.REG_URL)
-					.params(params)
+					.params(update_params)
 					.success(iSuccess)
 					.error(iError)
 					.build()
@@ -600,59 +516,45 @@ public class HttpService {
 		}
 	}
 
-
-
 	//手机号注册账号
-	public static void doMobileRegister(String mobile, String code, String password, final ISuccess iSuccess, IError iError) {
+	public static void doMobileRegister(String mobile, String code, String password,  final ISuccess iSuccess, IError iError) {
 
 		try {
-
 			HashMap<String,String> params = getCommonParams();
-
 			JSONObject obj = new JSONObject();
 			obj.put("mobile",mobile);
 			obj.put("passwd",password);
 			obj.put("rand_code",code);
 			String content = obj.toString();
 			params.put("content",content);
-
-			params.put("sign", Md5Util.getMd5(content + GameSDK.getInstance().getGameInfo().getRegKey()));
-
+			String app_secret = "3d759cba73b253080543f8311b6030bf";
+			String versionCode = PROXY_VERSION ;
+			params.put("proxyVersion",versionCode);
+			HashMap<String, String> update_params = Util.getSign(params ,app_secret );
+			//params.put("sign", Md5Util.getMd5(content + GameSDK.getInstance().getGameInfo().getRegKey()));
 			//返回
 			//网络请求
 			RestClient.builder()
 					.url(SDK.URL.REG_MOBILE)
-					.params(params)
+					.params(update_params)
 					.success(new ISuccess() {
 						@Override
 						public void onSuccess(String response) {
-
 							final int code = JSON.parseObject(response).getIntValue("code");
 							switch (code) {
 								case ResultCode.SUCCESS: //成功
-
 									if (GameSDK.getInstance().getmLoginListener() != null) {
 										GameSDK.getInstance().getmLoginListener().onSuccess(response.toString());
 									}
-
 									iSuccess.onSuccess(response);
-
 									break;
 								default:
-
 									if (GameSDK.getInstance().getmLoginListener() != null) {
 										GameSDK.getInstance().getmLoginListener().onFail(response.toString());
-
 									}
-
 									iSuccess.onSuccess(response);
-
 									break;
-
-
 							}
-
-
 							}
 					})
 					.error(iError)
@@ -667,15 +569,79 @@ public class HttpService {
 
 
 
+	//注销接口 act_type: 2 注销 1：退出
+	public static void doCancel( String act_type, ISuccess iSuccess, IError iError) {
+
+		try {
+			HashMap<String,String> params =  new HashMap<String,String>();
+			UserInfo userInfo = GameSDK.getInstance().getUserInfo();
+			GameInfo gameInfo = GameSDK.getInstance().getGameInfo();
+			String open_id ="";
+			String server_id ="";
+			String nick_name ="";
+			String uid = "";
+
+			if(userInfo.getOpenId()!=null){
+				open_id = userInfo.getOpenId();
+			}
+			if(userInfo.getServerId()!=0){
+				server_id = String.valueOf(userInfo.getServerId());
+			}
+			if(userInfo.getUsername()!=null){
+				nick_name = userInfo.getUsername();
+			}
+			if(userInfo.getUid()!=null){
+				uid = userInfo.getUid();
+			}
+
+			String platform = gameInfo.getPlatform();
+			String game_id =  gameInfo.getGameId();
+			String channel = gameInfo.getChannel();
+			String ad_channel = gameInfo.getAdChannel();
+			String app_secret = gameInfo.getAppKey();
+			String versionCode = PROXY_VERSION ;
+			String msi = DeviceUtil.getDeviceId();
+			params.put("game_id", game_id);//游戏名称
+			params.put("open_id",open_id );
+			params.put("imei",msi );
+			params.put("channel",channel );
+			params.put("ad_channel",ad_channel  );
+			params.put("proxyVersion",versionCode);
+			params.put("act_type",act_type);
+			params.put("uid",uid);
+			params.put("server_id",server_id );
+			params.put("nick_name",nick_name );
+			Collection<String> keyset= params.keySet();
+			List<String> list = new ArrayList<String>(keyset);
+			Collections.sort(list);
+			String key = "";
+			for(int i=0;i<list.size();i++){
+				if(params.get(list.get(i))==null || params.get(list.get(i))=="") {
+					continue;
+				}
+				key += list.get(i)+"="+params.get(list.get(i))+"&";
+			}
+			key += "app_secret="+app_secret;
+			params.put("sign",Md5Util.getMd5(key));
+			//KnLog.log("排序字段:"+key);
+			RestClient.builder()
+					.url(SDK.URL.CANCEL)
+					.params(params)
+					.success(iSuccess)
+					.error(iError)
+					.build()
+					.post();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	//发送等级url
 	public static void enterGame( GameUser gameUser,ISuccess iSuccess,IError iError) {
 		try {
-
 			String versionCode ="";
 			String app_secret = "3d759cba73b253080543f8311b6030bf";
 			GameInfo gameInfo = GameSDK.getInstance().getGameInfo();
-
-
 			String channel = gameInfo.getChannel();//渠道
 			String adchannel = gameInfo.getAdChannel();//广告渠道
 			String mis = DeviceUtil.getDeviceId(); //IMEI码
@@ -720,9 +686,6 @@ public class HttpService {
 		}
 	}
 
-
-
-	
 	public static void chanagePwd(Activity activity,
 			String username, String oldpassword , String newpassword , BaseListener listener) {
 		try {
@@ -788,7 +751,7 @@ public class HttpService {
 		UserInfo userInfo = GameSDK.getInstance().getUserInfo();
 		GameInfo gameInfo = GameSDK.getInstance().getGameInfo();
 		
-		String open_id="",game_id="",channel="",ad_channel="",msi="",platform="";
+		String open_id="",game_id="",channel="",ad_channel="",msi="",platform="",appkey= "";
 		String uid="",server_id="";
 		
 		if(userInfo!= null){
@@ -802,29 +765,36 @@ public class HttpService {
 			game_id =  gameInfo.getGameId();
 			channel = gameInfo.getChannel();
 			ad_channel = gameInfo.getAdChannel();
+			appkey = gameInfo.getAppKey();
 		}
 		msi = DeviceUtil.getDeviceId();
-		
-		params.put("game_id", game_id);
-		params.put("channel", channel);
-		params.put("ad_channel", ad_channel);
+		String Product = BuildHelper.getProduct(); //手机制造商
+		String Mode = BuildHelper.getMode(); //手机型号
+		String ip =DeviceUtil.getIPAddress(); //手机ip地址
+		String time = Util.getTimes();
+
+
+		params.put("game_id", game_id); //游戏名称
+		params.put("channel", channel); //联运渠道
+		params.put("ad_channel", ad_channel); //广告渠道
 		params.put("uid", String.valueOf(uid));
 		params.put("open_id", open_id);
 		params.put("server_id", String.valueOf(server_id));
 		params.put("mac", DeviceUtil.getMacAddress());
 		params.put("platform", platform);
-		params.put("phoneType", DeviceUtil.getPhoneType());
-		params.put("netType", DeviceUtil.getNetWorkType());
+		params.put("netType", DeviceUtil.getNetWorkType()); //手机网络状态
+		//params.put("phoneType", DeviceUtil.getPhoneType()); //手机型号
+		params.put("app_key",appkey);
 		
 		String appInfo = Util.getAppInfo( GameSDK.getInstance().getActivity() );
-		params.put("packageName", Util.getJsonStringByName(appInfo, "packageName") );
-		params.put("versionName", Util.getJsonStringByName(appInfo, "versionName") );
+		params.put("packageName", Util.getJsonStringByName(appInfo, "packageName") ); //客户端包名
+		params.put("versionName", Util.getJsonStringByName(appInfo, "versionName") ); //客户端版本
 		params.put("versionCode", Util.getJsonStringByName(appInfo, "versionCode") );
-
-
-		params.put("msi", msi );
+		params.put("msi", msi );//手机IMEI码
+		params.put("phone_type",Product+"_"+Mode); //手机型号
+		params.put("ip",ip); //手机型号
+		params.put("time",time); //当前时间
 		KnLog.log(" Login params :"+params.toString());
-
 		return params;
 		
 	}
